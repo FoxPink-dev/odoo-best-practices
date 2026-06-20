@@ -58,9 +58,11 @@ class TestReporterSummary:
 
 class TestReporterIssues:
     def test_missing_acl_issue(self, all_results):
-        issues = [i for i in all_results.get("issues", [])
-                  if i.get("rule") == "security-acl-required"]
-        missing = [i for i in issues if "demo.config" in i.get("message", "")]
+        check_results = all_results.get("check_results", {})
+        violations = check_results.get("violations", [])
+        acl_violations = [v for v in violations
+                          if v.get("rule") == "security-acl-required"]
+        missing = [v for v in acl_violations if "demo.config" in v.get("message", "")]
         assert len(missing) >= 1
 
     def test_missing_description_issue(self, all_results):

@@ -52,11 +52,12 @@ class Checker:
         for model_name, method_list in methods.items():
             for method_info in method_list:
                 code = method_info.get("code", "")
-                if "for " in code and "search(" in code:
+                # Look for search() or browse() called inside a for loop
+                if ("for " in code and "search(" in code) or ("for " in code and ".browse(" in code):
                     self.violations.append({
                         "severity": "CRITICAL",
                         "rule": "orm-no-n-plus-1",
-                        "message": "search() inside loop in method '%s'" % (method_info.get("name", "?"),),
+                        "message": "search() or browse() inside loop in method '%s'" % (method_info.get("name", "?"),),
                         "file": method_info.get("file", ""),
                         "line": method_info.get("line", 1),
                         "confidence": 85,

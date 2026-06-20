@@ -3,6 +3,8 @@ import os
 import sys
 import tempfile
 
+import pytest
+
 PROJECT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 FIXTURE_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "fixtures", "demo_addon"))
 
@@ -74,14 +76,15 @@ class TestCLIIntegration:
             out_path = os.path.join(tmp, "output")
             rc, out, err = _run_cli([FIXTURE_DIR, "--format", "sarif", "-o", out_path])
             assert rc == 0
-            sarif_path = out_path + ".sari"
-            if os.path.isfile(sarif_path):
-                data = json.load(open(sarif_path))
-                assert data["version"] == "2.1.0"
-                assert len(data["runs"]) == 1
-            else:
-                from analyzer.sarif import violations_to_sarif
-                pass  # SARIF may have gone to stdout
+            for ext in [".sarif", ".sari"]:
+                sarif_path = out_path + ext
+                if os.path.isfile(sarif_path):
+                    data = json.load(open(sarif_path))
+                    assert data["version"] == "2.1.0"
+                    assert len(data["runs"]) == 1
+                    assert "results" in data["runs"][0]
+                    return
+            pytest.fail("No SARIF file found (tried .sarif and .sari)")
 
     def test_cli_init_all(self):
         with tempfile.TemporaryDirectory() as tmp:

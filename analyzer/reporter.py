@@ -16,9 +16,9 @@ class Reporter:
             "addon": self.addon_name,
             "path": self.addon_dir,
             "manifest": {},
-            "models": [],
-            "fields": [],
-            "methods": [],
+            "models": {},
+            "fields": {},
+            "methods": {},
             "views": [],
             "actions": [],
             "menus": [],
@@ -171,18 +171,8 @@ class Reporter:
         return list(declared - acl_models)
 
     def _check_issues(self):
-        """Detect potential issues in the addon codebase."""
+        """Detect potential issues in the addon codebase (non-duplicate of Checker)."""
         issues = []
-
-        # Models without ACL
-        missing_acl = self._models_missing_acl()
-        for m in missing_acl:
-            issues.append({
-                "severity": "CRITICAL",
-                "rule": "security-acl-required",
-                "message": "Model '%s' has no ACL entry" % m,
-                "model": m,
-            })
 
         # Models without _description
         for name, info in self.results["models"].items():
@@ -198,7 +188,6 @@ class Reporter:
         for model_name, methods in self.results["methods"].items():
             for method in methods:
                 decorators = method.get("decorators", [])
-                # write() inside compute
                 if method.get("name") == "write" and any("api.depends" in d for d in decorators):
                     issues.append({
                         "severity": "HIGH",
@@ -338,7 +327,7 @@ class Reporter:
                 fname = v.get("file", "")
                 line = v.get("line", "?")
                 parts.append(
-                    f"| **{v.get('severity', '?')}** | {v.get('rule', '?')} | {fname}:{line} | {v.get('message', '?')} |"
+                    f"| **{v.get('severity', '?')}** | {v.get('rule', '?')} | {fname} | {line} | {v.get('message', '?')} |"
                 )
             parts.append("")
         else:

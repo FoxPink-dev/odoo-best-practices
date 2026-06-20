@@ -27,7 +27,6 @@ File format (baseline.json):
 
 import json
 import os
-import hashlib
 from datetime import datetime, timezone
 
 
@@ -41,12 +40,6 @@ def _violation_key(v):
     Used for matching against baseline entries.
     """
     return (v.get("rule", ""), v.get("file", ""), v.get("line", 0))
-
-
-def _make_hash(v):
-    """Create a content hash for a violation (for fuzzy matching)."""
-    raw = json.dumps(v, sort_keys=True, default=str).encode("utf-8")
-    return hashlib.sha256(raw).hexdigest()[:12]
 
 
 class Baseline:

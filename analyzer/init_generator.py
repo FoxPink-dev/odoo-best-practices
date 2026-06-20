@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import shutil
 
 _SKILL_NAME = "odoo-best-practices"
 _VERSION = "2.0.0"
@@ -40,9 +39,10 @@ def _read_rules_content():
 
 
 def generate_opencode(output_dir):
+    rules_count = _rules_count()
     skill = {
         "name": _SKILL_NAME,
-        "description": "Odoo development best practices skill pack — 130+ rules across 13 categories: ORM, security, views, OWL, testing, migration, API, data, i18n, deploy, and anti-pattern detection. Covers Odoo 14-19.",
+        "description": "Odoo development best practices skill pack — %s rules across 13 categories: ORM, security, views, OWL, testing, migration, API, data, i18n, deploy, and anti-pattern detection. Covers Odoo 14-19." % rules_count,
         "version": _VERSION,
         "author": _AUTHOR,
         "license": "MIT",
@@ -93,13 +93,6 @@ def generate_opencode(output_dir):
     return skill_path
 
 
-def _copy_skel(target_dir):
-    for name in ("SKILL.md", "AGENTS.md"):
-        src = os.path.join(_project_root(), name)
-        if os.path.isfile(src):
-            shutil.copy2(src, os.path.join(target_dir, name))
-
-
 def generate_claude(output_dir, content):
     target_dir = os.path.join(output_dir, ".claude", "rules")
     os.makedirs(target_dir, exist_ok=True)
@@ -115,7 +108,7 @@ def generate_cursor(output_dir, content):
     filepath = os.path.join(target_dir, "odoo-best-practices.mdc")
     with open(filepath, "w", encoding="utf-8") as f:
         f.write("---\n")
-        f.write("description: Odoo development best practices (130+ rules)\n")
+        f.write("description: Odoo development best practices (%s rules)\n" % _rules_count())
         f.write("globs: \"**/*.py\"\n")
         f.write("---\n")
         f.write(content)

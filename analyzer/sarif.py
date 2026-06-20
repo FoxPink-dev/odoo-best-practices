@@ -14,6 +14,7 @@ import json
 from .constants import SEVERITY_TO_LEVEL
 
 SARIF_SCHEMA = "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
+FALLBACK_VERSION = "1.0.0-beta.1"
 
 # Rule metadata catalog — extends what the checker produces
 # Includes fix suggestions for each rule
@@ -140,7 +141,7 @@ def violations_to_sarif(violations, tool_info=None):
     if tool_info is None:
         tool_info = {
             "name": "odoo-analyzer",
-            "version": "2.1.0",
+            "version": FALLBACK_VERSION,
             "informationUri": "https://github.com/FoxPink-dev/odoo-best-practices",
         }
 
@@ -154,7 +155,8 @@ def violations_to_sarif(violations, tool_info=None):
     }
 
     results = []
-    seen_rules = set()
+    seen_rules = {}
+    rule_index = 0
 
     for v in violations:
         rule_id = v.get("rule", "unknown-rule")
@@ -164,10 +166,12 @@ def violations_to_sarif(violations, tool_info=None):
         file_path = v.get("file", "")
         line_num = v.get("line", 1)
 
+        rule_meta = RULE_CATALOG.get(rule_id, DEFAULT_RULE)
+
         # Track unique rules for the rules array
         if rule_id not in seen_rules:
-            seen_rules.add(rule_id)
-            rule_meta = RULE_CATALOG.get(rule_id, DEFAULT_RULE)
+            seen_rules[rule_id] = rule_index
+            rule_index += 1
             rule_entry = {
                 "id": rule_id,
                 "shortDescription": {"text": rule_meta["shortDescription"]},
@@ -180,7 +184,7 @@ def violations_to_sarif(violations, tool_info=None):
 
         result = {
             "ruleId": rule_id,
-            "ruleIndex": list(seen_rules).index(rule_id),
+            "ruleIndex": seen_rules[rule_id],
             "level": level,
             "message": {"text": message},
             "locations": [
@@ -201,8 +205,7 @@ def violations_to_sarif(violations, tool_info=None):
         }
 
         # Add fix suggestion if available
-        rule_meta = RULE_CATALOG.get(rule_id)
-        if rule_meta and "fixSuggestion" in rule_meta:
+        if "fixSuggestion" in rule_meta:
             result["fixSuggestion"] = rule_meta["fixSuggestion"]
 
         results.append(result)

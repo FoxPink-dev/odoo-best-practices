@@ -128,7 +128,6 @@ def main():
     v_summary = {"total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0}
 
     if generate_baseline:
-        from analyzer.baseline import Baseline
         print(f"::group::Generating baseline")
         bl = Baseline(abs_addon, baseline_path=baseline_path)
         baseline = bl.generate()

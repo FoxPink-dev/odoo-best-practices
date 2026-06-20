@@ -1,4 +1,5 @@
 import ast
+import sys
 
 
 def ast_node_to_value(node):
@@ -7,14 +8,16 @@ def ast_node_to_value(node):
     Handles Python 3.8+ (ast.Constant) and legacy (ast.Str, ast.Num) nodes
     for compatibility with Odoo codebases running on Python 3.6+.
     """
-    if isinstance(node, ast.Constant):
+    Constant = getattr(ast, 'Constant', None)
+    if Constant is not None and isinstance(node, Constant):
         return node.value
-    elif isinstance(node, ast.Str):
-        return node.s
-    elif isinstance(node, ast.Num):
-        return node.n
-    elif isinstance(node, ast.NameConstant):
-        return node.value
+    if sys.version_info < (3, 8):
+        if isinstance(node, ast.Str):
+            return node.s
+        if isinstance(node, ast.Num):
+            return node.n
+        if isinstance(node, ast.NameConstant):
+            return node.value
     elif isinstance(node, ast.Name):
         return node.id
     elif isinstance(node, ast.List):

@@ -68,7 +68,8 @@ class TestCLIIntegration:
 
     def test_cli_baseline_generate(self):
         with tempfile.TemporaryDirectory() as tmp:
-            rc, out, err = _run_cli([FIXTURE_DIR, "--baseline"])
+            baseline_path = os.path.join(tmp, "odoo-baseline.json")
+            rc, out, err = _run_cli([FIXTURE_DIR, "--baseline", "--baseline-path", baseline_path])
             assert rc == 0
 
     def test_cli_sarif_output(self):

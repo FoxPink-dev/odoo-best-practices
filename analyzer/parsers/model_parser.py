@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import ast
+import sys
 from .common import ast_node_to_value
 
 
@@ -236,14 +237,16 @@ class ModelParser:
 
     def _ast_val_to_str(self, node):
         """Convert AST value node to a string representation."""
-        if isinstance(node, ast.Constant):
+        Constant = getattr(ast, 'Constant', None)
+        if Constant is not None and isinstance(node, Constant):
             return node.value
-        elif isinstance(node, ast.Str):
-            return node.s
-        elif isinstance(node, ast.Num):
-            return node.n
-        elif isinstance(node, ast.NameConstant):
-            return node.value
+        if sys.version_info < (3, 8):
+            if isinstance(node, ast.Str):
+                return node.s
+            if isinstance(node, ast.Num):
+                return node.n
+            if isinstance(node, ast.NameConstant):
+                return node.value
         elif isinstance(node, ast.List):
             return [_ast_to_value(el) for el in node.elts]
         elif isinstance(node, ast.Dict):

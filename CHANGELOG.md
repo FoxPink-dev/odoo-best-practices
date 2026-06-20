@@ -6,7 +6,7 @@ Public beta release of the Odoo Engineering Platform.
 
 ### Added
 
-- Static analysis engine with 118 rules across 13 categories
+- Static analysis engine with 136 rules across 13 categories
 - 12 anti-pattern detectors (search-in-loop, sudo-everywhere, etc.)
 - MCP server with 14 tools for AI agent integration (Cursor, Claude Code, OpenCode)
 - GitHub Action for automated PR review with annotations and Code Scanning

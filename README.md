@@ -73,7 +73,7 @@ jobs:
           addon-path: '.'
           fail-on-critical: 'true'
           fail-on-high: 'true'
-          baseline: "${{ github.event.action == 'opened' || github.event.action == 'reopened' }}"
+          baseline: 'true'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload SARIF to Code Scanning

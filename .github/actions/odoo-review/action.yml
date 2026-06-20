@@ -41,3 +41,5 @@ runs:
     - ${{ inputs.addon-path }}
     - ${{ inputs.fail-on-critical }}
     - ${{ inputs.fail-on-high }}
+    - ${{ inputs.generate-baseline }}
+    - ${{ inputs.baseline-path }}

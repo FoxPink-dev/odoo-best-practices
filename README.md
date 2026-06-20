@@ -68,12 +68,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Odoo Static Analysis
-        uses: ./github/actions/odoo-review
+        uses: ./.github/actions/odoo-review
         with:
           addon-path: '.'
           fail-on-critical: 'true'
           fail-on-high: 'true'
-          baseline: '${{ github.event.action == 'opened' || github.event.action == 'reopened' }}'
+          baseline: "${{ github.event.action == 'opened' || github.event.action == 'reopened' }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload SARIF to Code Scanning
@@ -284,7 +284,7 @@ GitHub Action automatically reviews every PR:
 ```yaml
 # .github/workflows/odoo-review.yml
 - name: Odoo Review
-  uses: ./github/actions/odoo-review
+  uses: ./.github/actions/odoo-review
   with:
     fail-on-critical: 'true'
 ```

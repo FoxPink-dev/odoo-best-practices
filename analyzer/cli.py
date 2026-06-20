@@ -36,7 +36,7 @@ def main():
     )
     parser.add_argument(
         "--format",
-        choices=["json", "markdown", "both", "sari"],
+        choices=["json", "markdown", "both", "sari", "sarif"],
         default="markdown",
         help="Output format (default: markdown)",
     )

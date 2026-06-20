@@ -3,6 +3,7 @@ name: version-16-owl-legacy
 priority: medium
 tags:
   - version
+  - odoo16
   - owl
   - js-framework
 odoo_versions:

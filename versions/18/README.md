@@ -3,6 +3,7 @@ name: version-18-legacy-removed
 priority: medium
 tags:
   - version
+  - odoo18
   - owl
   - breaking-change
 odoo_versions:

@@ -65,6 +65,15 @@ class AccountMove(models.Model):
         return super().action_post()
 ```
 
+## Known Pitfalls
+
+- `action_post()` is irreversible — validate before calling
+- Tax lines are auto-generated on post; manual tax line edits may be overwritten
+- Currency rate is locked at `invoice_date` — changes after posting don't affect the move
+- Don't modify `line_ids` directly for invoice lines — use `recompute()` or write through the line model
+- `state` field transitions are strictly enforced: `draft → posted → cancel`
+- Deleting a posted invoice requires `button_cancel()` first
+
 ## References
 
 - test-tags-correct

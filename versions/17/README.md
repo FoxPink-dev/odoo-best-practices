@@ -3,6 +3,7 @@ name: version-17-owl-dominant
 priority: medium
 tags:
   - version
+  - odoo17
   - owl
   - js-framework
 odoo_versions:

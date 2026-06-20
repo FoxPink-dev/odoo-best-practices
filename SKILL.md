@@ -6,7 +6,9 @@ description: >
   migration. This skill should be used when writing, reviewing, or
   refactoring Odoo modules to ensure production-grade quality and
   upgrade-safe patterns. Triggers on tasks involving Odoo models, views,
-  ORM queries, security rules, OWL components, tests, or data migration.
+  ORM queries, security rules, OWL components, tests, data migration,
+  API controllers, i18n translations, reports, deployment, or
+  performance optimization. Covers Odoo 14 through 19.
 license: MIT
 metadata:
   author: FoxPink
@@ -30,6 +32,11 @@ Reference these guidelines when:
 - Creating automated tests (TransactionCase, HttpCase)
 - Reviewing Odoo code for performance, security, or upgrade safety
 - Setting up module structure following OCA conventions
+- Creating API endpoints (web controllers, portal routes)
+- Implementing PDF/Excel reports and email templates
+- Managing translations and internationalization (i18n)
+- Configuring deployment parameters and multi-company setup
+- Designing data migration paths with XML IDs and noupdate
 
 ## Rule Categories by Priority
 

@@ -3,6 +3,7 @@ name: version-15-owl-intro
 priority: low
 tags:
   - version
+  - odoo15
   - owl
   - fields-command
   - t-out

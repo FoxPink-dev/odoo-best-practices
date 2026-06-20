@@ -3,6 +3,7 @@ name: version-14-legacy-widgets
 priority: low
 tags:
   - version
+  - odoo14
   - views
   - legacy
   - owl

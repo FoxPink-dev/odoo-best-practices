@@ -71,7 +71,7 @@ class ProductProduct(models.Model):
                 record.custom_stock_field = record.qty_available
 ```
 
-## Pitfalls
+## Known Pitfalls
 
 - `qty_available` is context-dependent (warehouse) — use `with_context(warehouse=x)`
 - Tracking changes require stock moves to be completed first

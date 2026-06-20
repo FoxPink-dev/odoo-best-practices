@@ -184,8 +184,8 @@ deploy-config-params, deploy-env-detection, deploy-feature-flags, deploy-logging
 | `<tree>` tag | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ Legacy |
 | `<list>` tag | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Canonical |
 | `t-esc` | ✅ | ✅ | ✅ | ⚠️ Deprecated | ❌ Removed | ❌ |
-| `t-out` | ❌ | ❌ | ❌ | ✅ | ✅ Required | ✅ Required |
-| `@api.one` | ❌ Removed | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `t-out` | ❌ | ✅ | ✅ | ✅ | ✅ Required | ✅ Required |
+| `@api.one` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | `models.Constraint` | ❌ | ❌ | ❌ | ❌ | ✅ New | ✅ Stable |
 | `search_fetch()` | ❌ | ❌ | ❌ | ❌ | ✅ New | ✅ Stable |
 | ORM `flush()` | ❌ | ❌ | ❌ | ❌ | ✅ New | ✅ Stable |

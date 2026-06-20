@@ -3,6 +3,7 @@ name: version-19-new-view-tags
 priority: medium
 tags:
   - version
+  - odoo19
   - views
   - breaking-change
 odoo_versions:

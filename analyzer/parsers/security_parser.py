@@ -16,35 +16,43 @@ class SecurityParser:
 
     def parse_addon(self, addon_dir):
         """Parse all security-related files in an addon directory."""
+        parsed_files = set()
         security_dir = os.path.join(addon_dir, "security")
         if os.path.isdir(security_dir):
             for fname in os.listdir(security_dir):
                 filepath = os.path.join(security_dir, fname)
-                rel_path = f"security/{fname}"
+                rel_path = "security/%s" % fname
                 if fname.endswith(".csv"):
+                    parsed_files.add(filepath)
                     self._parse_acl_csv(filepath)
                 elif fname.endswith(".xml"):
                     self._parse_security_xml(filepath, rel_path)
 
-        # Also scan other directories for CSV files
+        # Scan other directories for CSV files (skip already parsed)
         for root, dirs, files in os.walk(addon_dir):
             dirs[:] = [d for d in dirs if d not in ("__pycache__", ".git", "migrations", "static")]
             for fname in files:
+                filepath = os.path.join(root, fname)
+                if filepath in parsed_files:
+                    continue
                 if fname.endswith(".csv") and "security" not in root:
-                    filepath = os.path.join(root, fname)
                     if "ir.model.access" in fname.lower() or "acl" in fname.lower():
+                        parsed_files.add(filepath)
                         self._parse_acl_csv(filepath)
 
         # Check CSV data files in any subdirectory for acl patterns
         for root, dirs, files in os.walk(addon_dir):
             dirs[:] = [d for d in dirs if d not in ("__pycache__", ".git", "migrations", "static")]
             for fname in files:
+                filepath = os.path.join(root, fname)
+                if filepath in parsed_files:
+                    continue
                 if fname.endswith(".csv"):
-                    filepath = os.path.join(root, fname)
                     try:
                         with open(filepath, "r", encoding="utf-8") as f:
                             header = f.readline()
                             if "id,name,model_id,group_id,perm_read" in header.lower():
+                                parsed_files.add(filepath)
                                 self._parse_acl_csv(filepath)
                     except (IOError, UnicodeDecodeError):
                         pass

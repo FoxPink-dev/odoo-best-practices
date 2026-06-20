@@ -105,7 +105,7 @@ def main():
     baseline_path = sys.argv[5] if len(sys.argv) > 5 else ""
     use_baseline = sys.argv[6].lower() == "true" if len(sys.argv) > 6 else False
 
-    github_token = os.environ.get("GITHUB_TOKEN", "")
+    github_token = os.environ.get("INPUT_GITHUB_TOKEN", os.environ.get("GITHUB_TOKEN", ""))
     github_repo = os.environ.get("GITHUB_REPOSITORY", "")
     pr_number = os.environ.get("GITHUB_PR_NUMBER", "")
 

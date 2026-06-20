@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "addon": "demo_addon",
+  "timestamp": "2026-06-20T12:16:03.215261+00:00",
+  "total_accepted": 4,
+  "accepted": [
+    {
+      "rule": "security-acl-required",
+      "file": "models/demo_model.py",
+      "line": 1
+    },
+    {
+      "rule": "orm-no-n-plus-1",
+      "file": "models/demo_model.py",
+      "line": 17
+    },
+    {
+      "rule": "orm-raw-sql",
+      "file": "models/demo_model.py",
+      "line": 23
+    },
+    {
+      "rule": "security-sudo-usage",
+      "file": "models/demo_model.py",
+      "line": 28
+    }
+  ]
+}

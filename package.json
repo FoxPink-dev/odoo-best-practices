@@ -13,7 +13,9 @@
     "odoo-review": "./bin/odoo-review.js"
   },
   "files": [
-    "bin/"
+    "bin/",
+    "SKILL.md",
+    "AGENTS.md"
   ],
   "publishConfig": {
     "access": "public"

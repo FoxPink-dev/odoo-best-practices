@@ -35,10 +35,9 @@ class ManifestParser:
         for node in ast.walk(tree):
             if isinstance(node, ast.Dict):
                 for key, val in zip(node.keys, node.values):
-                    k = key.s if isinstance(key, ast.Str) else ""
-                    v = _ast_to_value(val)
-                    if k:
-                        manifest[k] = v
+                    k = ast_node_to_value(key)
+                    if isinstance(k, str):
+                        manifest[k] = _ast_to_value(val)
                 break
         return manifest
 

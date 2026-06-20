@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import ast
+from .common import ast_node_to_value
 
 
 class ModelParser:
@@ -274,40 +275,5 @@ class ModelParser:
 
 
 def _ast_to_value(node):
-    """AST node to Python value (handles Python 3.8+ ast.Constant)."""
-    if isinstance(node, ast.Constant):
-        return node.value
-    elif isinstance(node, ast.Str):
-        return node.s
-    elif isinstance(node, ast.Num):
-        return node.n
-    elif isinstance(node, ast.NameConstant):
-        return node.value
-    elif isinstance(node, ast.List):
-        return [_ast_to_value(el) for el in node.elts]
-    elif isinstance(node, ast.Dict):
-        return {
-            _ast_to_value(k): _ast_to_value(v)
-            for k, v in zip(node.keys, node.values)
-            if _ast_to_value(k) is not None
-        }
-    elif isinstance(node, ast.Tuple):
-        return tuple(_ast_to_value(el) for el in node.elts)
-    elif isinstance(node, ast.Name):
-        return node.id
-    elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
-        val = _ast_to_value(node.operand)
-        return -val if isinstance(val, (int, float)) else None
-    elif isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
-        left = _ast_to_value(node.left)
-        right = _ast_to_value(node.right)
-        if isinstance(left, str) and isinstance(right, str):
-            return left + right
-        if isinstance(left, (int, float)) and isinstance(right, (int, float)):
-            return left + right
-        return None
-    elif isinstance(node, ast.Call):
-        return None
-    elif isinstance(node, ast.Set):
-        return {_ast_to_value(el) for el in node.elts}
-    return None
+    """AST node to Python value. Deprecated: use common.ast_node_to_value."""
+    return ast_node_to_value(node)

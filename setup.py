@@ -8,7 +8,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/FoxPink-dev/odoo-best-practices",
     license="MIT",
-    author="videcode",
+    author="FoxPink",
     packages=find_packages(include=["analyzer", "analyzer.*"]),
     include_package_data=True,
     python_requires=">=3.6",

@@ -137,12 +137,12 @@ def main():
         v_summary = check_results.get("summary", {})
 
         print("Repository: %s" % (summary.get('module_name', os.path.basename(addon_path)),))
-        print("  Models:     %s).get('total', 0)}" % (summary.get('models', {,))
-        print("  Fields:     %s).get('total', 0)}" % (summary.get('fields', {,))
-        print("  Views:      %s).get('total', 0)}" % (summary.get('views', {,))
-        print("  Actions:    %s).get('total', 0)}" % (summary.get('actions', {,))
-        print("  ACLs:       %s).get('acls', 0)}" % (summary.get('security', {,))
-        print("  Record Rules: %s).get('record_rules', 0)}" % (summary.get('security', {,))
+        print("  Models:     %s" % (summary.get('models', {}).get('total', 0),))
+        print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),))
+        print("  Views:      %s" % (summary.get('views', {}).get('total', 0),))
+        print("  Actions:    %s" % (summary.get('actions', {}).get('total', 0),))
+        print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),))
+        print("  Record Rules: %s" % (summary.get('security', {}).get('record_rules', 0),))
         print()
 
         v_total = v_summary.get("total", 0)
@@ -253,17 +253,19 @@ def main():
 
     print("\n  Module:     %s" % (summary.get('module_name', 'unknown'),), file=sys.stderr)
     print("  Version:    %s" % (summary.get('manifest_version', 'unknown'),), file=sys.stderr)
-    print("  Models:     %s).get('total', 0)}" % (summary.get('models', {,), file=sys.stderr)
-    print("  Fields:     %s).get('total', 0)}" % (summary.get('fields', {,), file=sys.stderr)
-    print("  Views:      %s).get('total', 0)}" % (summary.get('views', {,), file=sys.stderr)
-    print("  ACLs:       %s).get('acls', 0)}" % (summary.get('security', {,), file=sys.stderr)
+    print("  Models:     %s" % (summary.get('models', {}).get('total', 0),), file=sys.stderr)
+    print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),), file=sys.stderr)
+    print("  Views:      %s" % (summary.get('views', {}).get('total', 0),), file=sys.stderr)
+    print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),), file=sys.stderr)
 
     if check_summary.get("total", 0) > 0:
-        print("  Violations: %s " % (check_summary.get('total', 0),)
-              "(C:%s " % (check_summary.get('critical',0),)
-              "H:%s " % (check_summary.get('high',0),)
-              "M:%s " % (check_summary.get('medium',0),)
-              "L:%s)" % (check_summary.get('low',0),), file=sys.stderr)
+        print("  Violations: %s (C:%s H:%s M:%s L:%s)" % (
+            check_summary.get('total', 0),
+            check_summary.get('critical', 0),
+            check_summary.get('high', 0),
+            check_summary.get('medium', 0),
+            check_summary.get('low', 0),
+        ), file=sys.stderr)
 
     missing_acl = summary.get("security", {}).get("models_missing_acl", [])
     if missing_acl:

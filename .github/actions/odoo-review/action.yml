@@ -1,6 +1,6 @@
 name: 'Odoo Static Analysis Review'
 description: 'Run Odoo code analysis on pull requests — detects CRITICAL/HIGH violations, missing ACLs, N+1 queries, and bad patterns'
-author: 'videcode'
+author: 'FoxPink'
 branding:
   icon: 'check-circle'
   color: 'green'

@@ -2,7 +2,7 @@
   "name": "odoo-best-practices",
   "description": "Odoo development best practices skill pack — 130+ rules across 13 categories: ORM, security, views, OWL, testing, migration, API, data, i18n, deploy, and anti-pattern detection. Covers Odoo 14-19.",
   "version": "2.0.0",
-  "author": "videcode",
+  "author": "FoxPink",
   "license": "MIT",
   "entry": "SKILL.md",
   "triggers": [

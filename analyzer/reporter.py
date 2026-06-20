@@ -182,7 +182,7 @@ class Reporter:
             issues.append({
                 "severity": "CRITICAL",
                 "rule": "security-acl-required",
-                "message": "Model '{m}' has no ACL entry",
+                "message": "Model '%s' has no ACL entry" % m,
                 "model": m,
             })
 
@@ -192,7 +192,7 @@ class Reporter:
                 issues.append({
                     "severity": "LOW",
                     "rule": "code-docstring-models",
-                    "message": "Model '{name}' has no _description",
+                    "message": "Model '%s' has no _description" % name,
                     "model": name,
                 })
 
@@ -205,7 +205,7 @@ class Reporter:
                     issues.append({
                         "severity": "HIGH",
                         "rule": "orm-computed-fields",
-                        "message": "Model '{model_name}': write() with @api.depends",
+                        "message": "Model '%s': write() with @api.depends" % model_name,
                         "model": model_name,
                         "method": method["name"],
                     })
@@ -218,7 +218,7 @@ class Reporter:
         def _serialize(obj):
             if isinstance(obj, set):
                 return list(obj)
-            raise TypeError("Type {type(obj)} not serializable")
+            raise TypeError("Type %s not serializable" % type(obj))
 
         return json.dumps(self.results, indent=indent, default=_serialize)
 
@@ -226,20 +226,20 @@ class Reporter:
         """Generate a human-readable markdown report."""
         s = self.results["summary"]
         lines = [
-            "# Repository Analysis: {self.addon_name}\n",
+            f"# Repository Analysis: {self.addon_name}\n",
         ]
 
         # Module info
         lines.append("## Module Info\n")
-        lines.append("- **Version**: {s.get('manifest_version', 'unknown')}")
-        lines.append("- **Dependencies**: {', '.join(s.get('dependencies', []))}")
+        lines.append(f"- **Version**: {s.get('manifest_version', 'unknown')}")
+        lines.append(f"- **Dependencies**: {', '.join(s.get('dependencies', []))}")
         lines.append("")
 
         # Models
         lines.append("## Models\n")
-        lines.append("- Total: **{s['models']['total']}**")
-        lines.append("- New (own models): **{s['models']['new_models']}**")
-        lines.append("- With inheritance: **{s['models']['with_inheritance']}**")
+        lines.append(f"- Total: **{s['models']['total']}**")
+        lines.append(f"- New (own models): **{s['models']['new_models']}**")
+        lines.append(f"- With inheritance: **{s['models']['with_inheritance']}**")
         lines.append("")
 
         model_list = self.results.get("models", {})
@@ -251,7 +251,7 @@ class Reporter:
                 inherit_str = ", ".join(info.get("inherit", [])) or "-"
                 fields_count = len(self.results["fields"].get(name, []))
                 lines.append(
-                    "| {name} | {info['class_name']} | {info['file']} | {inherit_str} | {fields_count} |"
+                    f"| {name} | {info['class_name']} | {info['file']} | {inherit_str} | {fields_count} |"
                 )
             lines.append("")
 
@@ -266,18 +266,18 @@ class Reporter:
         views = self.results.get("views", [])
         if views:
             lines.append("## Views\n")
-            lines.append("- Total: **{len(views)}**")
+            lines.append(f"- Total: **{len(views)}**")
             by_type = s.get("views", {}).get("by_type", {})
-            lines.append("- Types: {', '.join(f'{k}={v}' for k, v in sorted(by_type.items()))}")
+            lines.append(f"- Types: {', '.join(f'{k}={v}' for k, v in sorted(by_type.items()))}")
             inherit_only = s.get("views", {}).get("inherit_only", 0)
             if inherit_only:
-                lines.append("- Inheritance views: **{inherit_only}**")
+                lines.append(f"- Inheritance views: **{inherit_only}**")
             lines.append("")
             lines.append("| ID | Name | Model | Type | Inherits |")
             lines.append("|----|------|-------|------|----------|")
             for v in views[:20]:  # limit table
                 lines.append(
-                    "| {v['id']} | {v['name']} | {v['model']} | {v['type']} | {v.get('inherit_id', '-')} |"
+                    f"| {v['id']} | {v['name']} | {v['model']} | {v['type']} | {v.get('inherit_id', '-')} |"
                 )
             lines.append("")
 
@@ -285,16 +285,16 @@ class Reporter:
         acls = self.results.get("acls", [])
         if acls:
             lines.append("## Security\n")
-            lines.append("- ACLs: **{len(acls)}**")
-            lines.append("- Groups: **{s.get('security', {}).get('groups', 0)}**")
-            lines.append("- Record Rules: **{s.get('security', {}).get('record_rules', 0)}**")
+            lines.append(f"- ACLs: **{len(acls)}**")
+            lines.append(f"- Groups: **{s.get('security', {}).get('groups', 0)}**")
+            lines.append(f"- Record Rules: **{s.get('security', {}).get('record_rules', 0)}**")
             lines.append("")
             lines.append("### ACLs\n")
             lines.append("| ID | Model | Group | Read | Write | Create | Unlink |")
             lines.append("|----|-------|-------|------|-------|--------|--------|")
             for a in acls[:15]:
                 lines.append(
-                    "| {a['id']} | {a['model_id']} | {a['group_id']} | {a['perm_read']} | {a['perm_write']} | {a['perm_create']} | {a['perm_unlink']} |"
+                    f"| {a['id']} | {a['model_id']} | {a['group_id']} | {a['perm_read']} | {a['perm_write']} | {a['perm_create']} | {a['perm_unlink']} |"
                 )
             lines.append("")
 
@@ -306,10 +306,44 @@ class Reporter:
             lines.append("|----------|------|---------|")
             for issue in issues:
                 lines.append(
-                    "| **{issue['severity']}** | {issue['rule']} | {issue['message']} |"
+                    f"| **{issue['severity']}** | {issue['rule']} | {issue['message']} |"
                 )
             lines.append("")
         else:
             lines.append("## Issues\n\nNo issues detected.\n")
 
         return "\n".join(lines)
+
+    def to_markdown_issues(self):
+        """Generate a markdown report with issues/violations only."""
+        parts = []
+        issues = self.results.get("issues", [])
+        if issues:
+            parts.append("## Issues Detected\n")
+            parts.append("| Severity | Rule | Message |")
+            parts.append("|----------|------|---------|")
+            for issue in issues:
+                parts.append(
+                    f"| **{issue['severity']}** | {issue['rule']} | {issue['message']} |"
+                )
+            parts.append("")
+        else:
+            parts.append("## Issues\n\nNo issues detected.\n")
+
+        check_results = self.results.get("check_results", {})
+        violations = check_results.get("violations", [])
+        if violations:
+            parts.append("## Violations\n")
+            parts.append("| Severity | Rule | File | Line | Message |")
+            parts.append("|----------|------|------|------|---------|")
+            for v in violations:
+                fname = v.get("file", "")
+                line = v.get("line", "?")
+                parts.append(
+                    f"| **{v['severity']}** | {v['rule']} | {fname}:{line} | {v['message']} |"
+                )
+            parts.append("")
+        else:
+            parts.append("## Violations\n\nNo violations detected.\n")
+
+        return "\n".join(parts)

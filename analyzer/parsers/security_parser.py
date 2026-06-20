@@ -20,7 +20,7 @@ class SecurityParser:
         if os.path.isdir(security_dir):
             for fname in os.listdir(security_dir):
                 filepath = os.path.join(security_dir, fname)
-                rel_path = "security/{fname}"
+                rel_path = f"security/{fname}"
                 if fname.endswith(".csv"):
                     self._parse_acl_csv(filepath)
                 elif fname.endswith(".xml"):

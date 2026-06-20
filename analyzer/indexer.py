@@ -158,18 +158,18 @@ class RepositoryIndex:
         search = {}
         for entry in self.index["models"]:
             search[entry["tech_name"]] = entry
-            search["model:{entry['tech_name']}"] = entry
+            search["model:%s" % entry['tech_name']] = entry
         for entry in self.index["views"]:
             search[entry["id"]] = entry
-            search["view:{entry['id']}"] = entry
+            search["view:%s" % entry['id']] = entry
         for entry in self.index["actions"]:
             search[entry["id"]] = entry
-            search["action:{entry['id']}"] = entry
+            search["action:%s" % entry['id']] = entry
         for entry in self.index["menus"]:
             search[entry["id"]] = entry
-            search["menu:{entry['id']}"] = entry
+            search["menu:%s" % entry['id']] = entry
         for entry in self.index["fields"]:
-            search["field:{entry['model']}.{entry['name']}"] = entry
+            search["field:%s.%s" % (entry['model'], entry['name'])] = entry
         self.index["_search"] = search
 
     # --- Query API (usable by AI as pseudo-MCP) ---
@@ -240,7 +240,7 @@ class RepositoryIndex:
         def _serialize(obj):
             if isinstance(obj, set):
                 return list(obj)
-            raise TypeError("Type {type(obj)} not serializable")
+            raise TypeError("Type %s not serializable" % type(obj))
 
         # Remove internal search index from output
         output = {k: v for k, v in self.index.items() if k != "_search"}
@@ -248,7 +248,7 @@ class RepositoryIndex:
 
     def _find(self, category, key, value):
         """Find an entry in a category by key-value match."""
-        for entry in self.index["{category}s"]:
+        for entry in self.index.get("%ss" % category, []):
             if entry.get(key) == value:
                 return entry
         return None
@@ -256,13 +256,17 @@ class RepositoryIndex:
     def summary(self):
         """Return a one-line summary of the repository."""
         return (
-            "Repository: {self.index['addon']} v{self.index['version']} | "
-            "{len(self.index['models'])} models, "
-            "{len(self.index['fields'])} fields, "
-            "{len(self.index['views'])} views, "
-            "{len(self.index['actions'])} actions, "
-            "{len(self.index['menus'])} menus, "
-            "{len(self.index['security']['acls'])} ACLs"
+            "Repository: %s v%s | "
+            "%s models, %s fields, %s views, %s actions, %s menus, %s ACLs"
+        ) % (
+            self.index['addon'],
+            self.index['version'],
+            len(self.index['models']),
+            len(self.index['fields']),
+            len(self.index['views']),
+            len(self.index['actions']),
+            len(self.index['menus']),
+            len(self.index['security']['acls']),
         )
 
 

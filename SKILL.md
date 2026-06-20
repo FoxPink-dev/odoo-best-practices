@@ -9,7 +9,7 @@ description: >
   ORM queries, security rules, OWL components, tests, or data migration.
 license: MIT
 metadata:
-  author: videcode
+  author: FoxPink
   version: 1.0.0
 ---
 

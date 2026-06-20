@@ -6,7 +6,7 @@ description: >
   data, i18n, deployment, and migration. Covers Odoo 14–19.
 license: MIT
 metadata:
-  author: videcode
+  author: FoxPink
   version: 2.0.0
 ---
 

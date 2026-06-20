@@ -35,7 +35,7 @@ RULE_CATALOG = {
             "cwe": "CWE-862",
             "tags": ["security", "access-control"],
         },
-        "helpUri": "https://github.com/videcode/odoo-best-practices/blob/main/rules/security-acl-required.md",
+        "helpUri": "https://github.com/FoxPink-dev/odoo-best-practices/blob/main/rules/security-acl-required.md",
         "fixSuggestion": {
             "title": "Create default ACL for new model",
             "description": "Add an ir.model.access record for this model to grant access to specific user groups or all users if needed.",
@@ -55,7 +55,7 @@ RULE_CATALOG = {
             "cwe": "CWE-400",
             "tags": ["performance", "orm", "scalability"],
         },
-        "helpUri": "https://github.com/videcode/odoo-best-practices/blob/main/rules/orm-no-n-plus-1.md",
+        "helpUri": "https://github.com/FoxPink-dev/odoo-best-practices/blob/main/rules/orm-no-n-plus-1.md",
         "fixSuggestion": {
             "title": "Replace in-loop search with batch fetch",
             "description": "Move the search() call outside the loop and use prefetch or batch operations to reduce database queries.",
@@ -148,7 +148,7 @@ def violations_to_sarif(violations, tool_info=None):
         tool_info = {
             "name": "odoo-analyzer",
             "version": "2.1.0",
-            "informationUri": "https://github.com/videcode/odoo-best-practices",
+            "informationUri": "https://github.com/FoxPink-dev/odoo-best-practices",
         }
 
     tool = {
@@ -180,7 +180,7 @@ def violations_to_sarif(violations, tool_info=None):
                 "shortDescription": {"text": rule_meta["shortDescription"]},
                 "fullDescription": {"text": rule_meta.get("fullDescription", message)},
                 "defaultConfiguration": {"level": level},
-                "helpUri": "https://github.com/videcode/odoo-best-practices/blob/main/rules/{rule_id}.md",
+                "helpUri": "https://github.com/FoxPink-dev/odoo-best-practices/blob/main/rules/%s.md" % rule_id,
                 "properties": rule_meta.get("properties", {}),
             }
             tool["driver"]["rules"].append(rule_entry)

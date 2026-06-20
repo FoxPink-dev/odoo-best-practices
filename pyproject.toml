@@ -9,7 +9,7 @@ description = "Static analysis + knowledge platform for Odoo engineering"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "videcode"}
+    {name = "FoxPink"}
 ]
 requires-python = ">=3.6"
 keywords = ["odoo", "static-analysis", "code-review", "linting", "mcp"]

@@ -256,7 +256,7 @@ class MCPServer:
             # No response expected
             return None
         else:
-            return jsonrpc_error(req_id, -32601, "Method not found: {method}")
+            return jsonrpc_error(req_id, -32601, f"Method not found: {method}")
 
     def _handle_initialize(self, req_id, params):
         self._initialized = True
@@ -288,7 +288,7 @@ class MCPServer:
         arguments = params.get("arguments", {})
 
         if tool_name not in self._tools:
-            return jsonrpc_error(req_id, -32602, "Unknown tool: {tool_name}")
+            return jsonrpc_error(req_id, -32602, f"Unknown tool: {tool_name}")
 
         # Get effective addon dir: tool argument overrides server default
         effective_dir = arguments.get("addon_dir", self.addon_dir)
@@ -299,9 +299,9 @@ class MCPServer:
             self.store = RepositoryStore(effective_dir)
             self.store.load()
 
-        handler = getattr(self, "tool_{tool_name}", None)
+        handler = getattr(self, f"tool_{tool_name}", None)
         if handler is None:
-            return jsonrpc_error(req_id, -32603, "Tool {tool_name} not implemented")
+            return jsonrpc_error(req_id, -32603, f"Tool {tool_name} not implemented")
 
         try:
             result = handler(effective_dir, arguments)
@@ -347,7 +347,7 @@ class MCPServer:
         # Build rich model context
         model = self.store.search_model(model_name)
         if not model:
-            return {"error": "Model '{model_name}' not found"}
+            return {"error": f"Model '{model_name}' not found"}
 
         fields = self.store.fields_for_model(model_name)
         methods = self.store.methods_for_model(model_name)
@@ -385,7 +385,7 @@ class MCPServer:
 
         view = self.store.search_view(view_id)
         if not view:
-            return {"error": "View '{view_id}' not found"}
+            return {"error": f"View '{view_id}' not found"}
 
         chain = self.store.view_inheritance_chain(view_id)
         return {
@@ -400,7 +400,7 @@ class MCPServer:
 
         action = self.store.search_action(action_id)
         if not action:
-            return {"error": "Action '{action_id}' not found"}
+            return {"error": f"Action '{action_id}' not found"}
 
         return {"action": action}
 
@@ -433,7 +433,7 @@ class MCPServer:
 
         explanation = self.store.explain_model(model_name)
         if not explanation.get("model"):
-            return {"error": "Model '{model_name}' not found"}
+            return {"error": f"Model '{model_name}' not found"}
 
         # Limit fields
         fields_list = explanation.get("fields", [])
@@ -491,7 +491,7 @@ def main():
 
     addon_dir = sys.argv[1]
     if not os.path.isdir(addon_dir):
-        print("Error: not a directory: {addon_dir}", file=sys.stderr)
+        print(f"Error: not a directory: {addon_dir}", file=sys.stderr)
         sys.exit(1)
 
     server = MCPServer(addon_dir)
@@ -511,7 +511,7 @@ def main():
             request = json.loads(line)
         except json.JSONDecodeError as e:
             # Can't send error without a valid ID
-            sys.stderr.write("JSON decode error: {e}\n")
+            sys.stderr.write(f"JSON decode error: {e}\n")
             sys.stderr.flush()
             continue
 

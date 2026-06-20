@@ -68,7 +68,7 @@ class RepositoryStore:
             return "Store not loaded. Call .load() first."
         if self._indexer:
             return self._indexer.summary()
-        return "Addon: {os.path.basename(self.addon_dir)} | {self._total_models} models"
+        return "Addon: %s | %s models" % (os.path.basename(self.addon_dir), self._total_models)
 
     # ------------------------------------------------------------------
     # Model queries
@@ -312,7 +312,7 @@ class RepositoryStore:
 
         Returns dict with 'violations' and 'summary'.
         """
-        if self._check_results:
+        if self._check_results is not None:
             return self._check_results
         return {"violations": [], "summary": {"total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0}}
 
@@ -338,7 +338,7 @@ class RepositoryStore:
         self._ensure_loaded()
         model = self.search_model(model_name)
         if not model:
-            return {"error": "Model '{model_name}' not found"}
+            return {"error": "Model '%s' not found" % model_name}
 
         fields = self.fields_for_model(model_name)
         methods = self.methods_for_model(model_name)

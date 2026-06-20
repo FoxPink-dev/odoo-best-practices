@@ -116,7 +116,7 @@ class ModelParser:
         call = node.value
         if not isinstance(call.func, ast.Attribute):
             return None
-        field_type = "{self._safe_name(call.func.value)}.{call.func.attr}" if isinstance(call.func.value, ast.Name) else call.func.attr
+        field_type = f"{self._safe_name(call.func.value)}.{call.func.attr}" if isinstance(call.func.value, ast.Name) else call.func.attr
 
         if "fields." not in field_type and "odoo.fields." not in field_type:
             return None
@@ -179,9 +179,9 @@ class ModelParser:
         if isinstance(node, ast.Name):
             return node.id
         elif isinstance(node, ast.Attribute):
-            return "{self._base_name(node.value)}.{node.attr}"
+            return f"{self._base_name(node.value)}.{node.attr}"
         elif isinstance(node, ast.Subscript):
-            return "{self._base_name(node.value)}[{self._base_name(node.slice)}]"
+            return f"{self._base_name(node.value)}[{self._base_name(node.slice)}]"
         return str(node)
 
     def _safe_name(self, node):
@@ -193,9 +193,9 @@ class ModelParser:
     def _decorator_name(self, node):
         """Convert a decorator AST node to string."""
         if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Attribute):
-            return "{self._base_name(node.value)}.{node.attr}"
+            return f"{self._base_name(node.value)}.{node.attr}"
         elif isinstance(node, ast.Attribute):
-            return "{node.value.id}.{node.attr}" if isinstance(node.value, ast.Name) else node.attr
+            return f"{node.value.id}.{node.attr}" if isinstance(node.value, ast.Name) else node.attr
         elif isinstance(node, ast.Name):
             return node.id
         elif isinstance(node, ast.Call):
@@ -235,13 +235,13 @@ class ModelParser:
         elif isinstance(node, ast.Dict):
             return {}
         elif isinstance(node, ast.Name):
-            return "ref:{node.id}"
+            return f"ref:{node.id}"
         elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "fields":
             arg0 = node.args[0] if node.args else None
             val = _ast_to_value(arg0) if arg0 else None
-            return "fields.{val}" if val else None
+            return f"fields.{val}" if val else None
         elif isinstance(node, ast.Attribute):
-            return "{self._ast_val_to_str(node.value)}.{node.attr}" if node.value else node.attr
+            return f"{self._ast_val_to_str(node.value)}.{node.attr}" if node.value else node.attr
         return None
 
     def get_model_summary(self):

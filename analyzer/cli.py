@@ -172,7 +172,7 @@ def main():
             print("  HIGH:      %s" % (v_summary.get('high', 0),))
             print("  MEDIUM:    %s" % (v_summary.get('medium', 0),))
             print("  LOW:       %s" % (v_summary.get('low', 0),))
-            print("  %s" % ('─' * 16,))
+            print("  %s" % ('-' * 16,))
             print("  Total:     %s" % (v_total,))
             print()
 

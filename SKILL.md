@@ -291,14 +291,21 @@ versions/14/README.md   # Odoo 14: Pre-OWL classic, Widget-only, last version be
 
 ## Knowledge Pack
 
-Domain knowledge for core Odoo models in `knowledge/`:
+Domain knowledge for 12 core Odoo models in `knowledge/`:
 
 ```
 knowledge/sale.order.md
 knowledge/account.move.md
+knowledge/account.payment.md
 knowledge/stock.picking.md
 knowledge/res.partner.md
+knowledge/res.users.md
 knowledge/product.product.md
+knowledge/crm.lead.md
+knowledge/purchase.order.md
+knowledge/hr.employee.md
+knowledge/project.task.md
+knowledge/mail.message.md
 ```
 
 ## Full Compiled Document

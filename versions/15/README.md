@@ -1,70 +1,66 @@
 ---
 name: version-15-owl-intro
-priority: medium
+priority: low
 tags:
   - version
   - owl
-  - migration
+  - fields-command
+  - t-out
 odoo_versions:
   - 15
 ---
+# Odoo 15 — OWL 1.x Introduced, t-out, fields.Command
 
-# Odoo 15 — OWL Introduction Year
+Odoo 15 introduces OWL 1.x as an officially supported frontend framework alongside the legacy widget system. New `fields.Command` API replaces magic tuple syntax for One2many/Many2many operations.
 
-Odoo 15 introduces OWL as the new JS framework, but legacy Widget still works. This is the first version where OWL components can be used.
+## Key Changes from 14
 
-## Key Rules
+| Feature | 14 | 15 |
+|---------|----|----|
+| OWL | Optional addon | First-class support |
+| `t-out` | ❌ Not available | ✅ New output directive |
+| `fields.Command` | ❌ | ✅ New ORM command API |
+| `@api.one` | ✅ | ❌ Removed |
+| Many2many tags widget | Widget | OWL component |
 
-| Aspect | Detail |
-|--------|--------|
-| OWL version | OWL 1.x — initial release, limited ecosystem |
-| View tag | `<tree>` only, `<list>` not supported |
-| JS framework | Legacy + OWL both available |
-| Python | Python 3.7+, `dataclasses` available |
-| `t-esc` vs `t-out` | Both work; `t-out` introduced |
-| `@api.depends` | Context propagation improved |
-| Reports | QWeb with `t-esc` (legacy) or `t-out` |
-| Search `parent_of` | Available in domain expressions |
-
-## OWL Introduction
+## OWL Component Pattern (Odoo 15)
 
 ```javascript
-// Odoo 15 — OWL 1.x available alongside legacy
-const { Component, useState, onMounted } = owl;
+// Odoo 15 — First OWL components appear in core
+const { Component } = owl;
+const { useState } = owl.hooks;
 
 class MyComponent extends Component {
-    setup() {
-        this.state = useState({ count: 0 });
-        onMounted(() => {
-            console.log('mounted');
-        });
-    }
+    static template = "my_addon.ComponentName";
+    state = useState({ count: 0 });
 }
 ```
 
-## Key Differences from 14
+## fields.Command API
 
-| Change | 14 | 15 |
-|--------|----|----|
-| OWL | Not available | OWL 1.x (experimental) |
-| `t-out` | Not available | New QWeb directive |
-| `fields.Command` | Not available | New command API for x2many |
-| `parent_of` operator | Not available | New domain operator |
-| Search panel | Basic | Enhanced with `searchable` option |
-| Many2many tags widget | Basic | Improved with `create_edit` option |
+```python
+# Odoo 15+ — use fields.Command instead of magic tuples
+from odoo import fields
 
-## Common Pitfalls
+# Instead of (0, 0, {...}), (1, id, {...}), (2, id), etc.
+self.order_line = [
+    fields.Command.create({"product_id": product.id, "price_unit": 100}),
+    fields.Command.update(line.id, {"price_unit": 120}),
+    fields.Command.delete(old_line.id),
+]
+```
 
-- OWL 1.x lacks `useService()`; services must be imported manually
-- No `props` validation in OWL 1.x — validate manually in `setup()`
-- Both Widget and OWL may conflict if mixed in the same view
-- `t-out` available but not required; `t-esc` still works everywhere
-- No `search_fetch()` — use plain `search()` for prefetching
-- Module manifest version format: `'version': '15.0.1.0.0'`
+## Migration Notes (14 → 15)
 
-## Migration Notes (14→15)
+- Replace `@api.one` — Odoo 15 removes it entirely
+- Adopt `fields.Command` — old magic tuples still work but deprecated
+- Introduce OWL components for new features
+- Test legacy widgets for compatibility
+- `t-out` available but not yet required alongside `t-esc`
 
-- Review all JS customizations: consider OWL for new features
-- QWeb `t-esc` can stay; migration to `t-out` is optional
-- `fields.Command` replaces tuple format `(0, 0, {...})` for x2many
-- Search view `<field>` can use `searchable="False"` to exclude from "Search..."
+## References
+
+- Odoo 15.0 JavaScript reference: OWL components
+- Odoo 15.0 ORM: `fields.Command` API
+- Odoo 15.0 release notes: Breaking changes
+- owl-t-out-over-t-esc — t-out vs t-esc

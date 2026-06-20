@@ -12,7 +12,7 @@ metadata:
 
 # Odoo Development Best Practices — Full Reference
 
-> **136 rules** across 13 categories with anti-pattern detection, version-specific guides, documentation references, and domain knowledge pack.
+> **136 rules** across 13 categories with anti-pattern detection, version-specific guides, documentation references, domain knowledge pack, and AI IDE integration.
 
 ## Structure
 
@@ -21,7 +21,7 @@ odoo-best-practices/
 ├── SKILL.md                      # Entry point — rule index + triggers
 ├── AGENTS.md                     # This file — full compiled reference
 ├── README.md                     # Project overview
-├── rules/                        # 118 detailed rule files
+├── rules/                        # 136 detailed rule files
 │   ├── module-*                  # Module architecture (CRITICAL)
 │   ├── orm-*                     # ORM & data access (CRITICAL)
 │   ├── security-*                # Security (HIGH)
@@ -37,6 +37,8 @@ odoo-best-practices/
 │   └── deploy-*                  # Deployment & config (LOW)
 ├── bad_patterns/                 # 12 anti-pattern detectors
 ├── versions/
+│   ├── 14/ README.md             # Odoo 14: Legacy widgets, pre-OWL
+│   ├── 15/ README.md             # Odoo 15: OWL 1.x, t-out, fields.Command
 │   ├── 16/ README.md             # Odoo 16 specifics
 │   ├── 17/ README.md             # Odoo 17 specifics
 │   ├── 18/ README.md             # Odoo 18 specifics
@@ -48,12 +50,19 @@ odoo-best-practices/
 │   ├── 17.0_*.md                 # Odoo 17 dev reference
 │   ├── 18.0_*.md                 # Odoo 18 dev reference
 │   └── 19.0_*.md                 # Odoo 19 dev reference
-├── knowledge/                    # Domain knowledge pack
+├── knowledge/                    # Domain knowledge pack (12 models)
 │   ├── sale.order.md
 │   ├── account.move.md
+│   ├── account.payment.md
 │   ├── stock.picking.md
 │   ├── res.partner.md
-│   └── product.product.md
+│   ├── res.users.md
+│   ├── product.product.md
+│   ├── crm.lead.md
+│   ├── purchase.order.md
+│   ├── hr.employee.md
+│   ├── project.task.md
+│   └── mail.message.md
 ├── analyzer/                     # Static analysis engine
 │   ├── store.py                  # RepositoryStore (unified API layer)
 │   ├── mcp_server.py             # MCP protocol server (14 tools)
@@ -67,9 +76,14 @@ odoo-best-practices/
 │       ├── model_parser.py
 │       ├── view_parser.py
 │       └── security_parser.py
-└── .github/                      # GitHub Action + CI
-    └── workflows/
-        └── odoo-review.yml
+├── .github/                      # GitHub Action + CI
+│   └── workflows/
+│       ├── odoo-review.yml
+│       ├── publish-pypi.yml
+│       └── publish-npm.yml
+├── package.json                  # npm wrapper for `npx odoo-review`
+├── bin/                          # npm CLI entry point
+└── .npmignore                    # npm publish filter
 ```
 
 ## Rule Categories

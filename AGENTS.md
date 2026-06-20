@@ -43,7 +43,7 @@ odoo-best-practices/
 │   ├── 17/ README.md             # Odoo 17 specifics
 │   ├── 18/ README.md             # Odoo 18 specifics
 │   └── 19/ README.md             # Odoo 19 specifics
-├── docs/                         # 50 official documentation refs
+├── docs/                         # 60 official documentation refs
 │   ├── 14.0_*.md                 # Odoo 14 dev reference
 │   ├── 15.0_*.md                 # Odoo 15 dev reference
 │   ├── 16.0_*.md                 # Odoo 16 dev reference

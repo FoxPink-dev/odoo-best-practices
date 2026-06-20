@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
 [![Odoo 14-19](https://img.shields.io/badge/Odoo-14%20to%2019-purple)](https://www.odoo.com)
+[![npm](https://img.shields.io/npm/v/@foxpink-dev/odoo-best-practices)](https://www.npmjs.com/package/@foxpink-dev/odoo-best-practices)
 
 Static analysis engine + domain knowledge platform + MCP server for Odoo module development. Covers **136 rules**, **12 anti-patterns**, **6 Odoo versions**, and provides **14 MCP tools** for AI-assisted code review.
 
@@ -10,14 +11,26 @@ Static analysis engine + domain knowledge platform + MCP server for Odoo module 
 
 ## Quick Start (5 minutes)
 
+<details>
+<summary><b>🐍 Python (recommended for full features)</b></summary>
+
 ```bash
 # 1. Clone
 git clone https://github.com/FoxPink-dev/odoo-best-practices.git
 cd odoo-best-practices
 
-# 2. Run analysis on your Odoo addon
+# 2. Run analysis on your Odoo addon (use python3 on Linux, full path on Windows)
 python -m analyzer.cli /path/to/your/addon --check
 ```
+</details>
+
+<details>
+<summary><b>📦 npm (quick start — config generation)</b></summary>
+
+```bash
+npx @foxpink-dev/odoo-best-practices init /path/to/your/addon
+```
+</details>
 
 **Expected output:**
 
@@ -113,6 +126,8 @@ After running, you will see in the PR:
 ```
 
 > **Tip**: On first run against a legacy repo, use `generate-baseline: 'true'` to baseline existing violations.
+>
+> **Note**: PyPI publish is currently skipped (npm-only distribution). See `publish-npm.yml` for npm CI publish workflow.
 
 ---
 
@@ -393,31 +408,31 @@ odoo-best-practices/
 ├── versions/{14,15,16,17,18,19}/ # Version-specific guides
 ├── docs/                          # 60 official Odoo docs (14-19)
 ├── analyzer/                      # Python static analysis engine
-│   ├── cli.py                     # CLI: 8 sub-commands (report/check/index/graph/stats/baseline/init)
+│   ├── cli.py                     # CLI: 8 sub-commands
 │   ├── checker.py                 # AST rule engine (4 checks)
 │   ├── constants.py               # Shared severity constants
-│   ├── indexer.py                 # Repository index
-│   ├── reporter.py                # Markdown/JSON report
-│   ├── baseline.py                # Baseline suppression
-│   ├── sarif.py                   # SARIF v2.1.0 output (7 rules with fix suggestions)
+│   ├── indexer.py                 # Repository index builder
+│   ├── reporter.py                # Markdown/JSON/SARIF report generator
+│   ├── baseline.py                # Baseline suppression system
+│   ├── sarif.py                   # SARIF v2.1.0 output with fix suggestions
 │   ├── store.py                   # RepositoryStore (unified API)
 │   ├── mcp_server.py              # MCP protocol server (14 tools)
 │   ├── graph.py                   # Inheritance + dependency graphs
 │   ├── init_generator.py          # Per-IDE config generator (5 IDEs)
-│   ├── parsers/
-│   │   ├── common.py              # Shared AST helpers
-│   │   ├── manifest_parser.py
-│   │   ├── model_parser.py
-│   │   ├── view_parser.py
-│   │   └── security_parser.py
-├── package.json                   # npm wrapper for `npx odoo-review`
+│   └── parsers/
+│       ├── common.py              # Shared AST helpers (ast_node_to_value)
+│       ├── manifest_parser.py     # AST-safe manifest parsing
+│       ├── model_parser.py        # Models, fields, methods, decorators
+│       ├── view_parser.py         # Views, actions, menus, templates
+│       └── security_parser.py     # ACLs, record rules, groups, categories
+├── package.json                   # npm package (scoped @foxpink-dev)
 ├── bin/                           # npm CLI entry point
 ├── .npmignore
 ├── .github/
-│   ├── workflows/odoo-review.yml
-│   ├── workflows/publish-pypi.yml
-│   ├── workflows/publish-npm.yml
-│   └── actions/odoo-review/
+│   ├── workflows/odoo-review.yml  # PR review CI
+│   ├── workflows/publish-pypi.yml # PyPI publish (requires Trusted Publisher)
+│   ├── workflows/publish-npm.yml  # npm publish
+│   └── actions/odoo-review/       # Docker action for GitHub CI
 │       └── entrypoint.py
 ```
 

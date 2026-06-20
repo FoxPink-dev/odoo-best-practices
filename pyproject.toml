@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "odoo-best-practices"
-version = "1.0.0-beta.1"
+version = "1.0.0-beta.2"
 description = "Static analysis + knowledge platform for Odoo engineering"
 readme = "README.md"
 license = {text = "MIT"}

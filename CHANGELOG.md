@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.0.0-beta.2 (2026-06-20)
+
+### Added
+
+- npm package published: `@foxpink-dev/odoo-best-practices` (`npx @foxpink-dev/odoo-best-practices`)
+
+### Changed
+
+- `package.json`: bumped to 1.0.0-beta.2 for CI publish
+- GitHub Action `publish-npm.yml`: stable after NPM_TOKEN secret + 2FA bypass setup
+- PyPI publish skipped (npm-only distribution)
+
+### Fixed
+
+- CI npm publish: version conflict resolved (manual publish vs CI race)
+
 ## v1.0.0-beta.1 (2026-06-20)
 
 Public beta release of the Odoo Engineering Platform.

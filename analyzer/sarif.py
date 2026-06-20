@@ -11,16 +11,9 @@ Usage:
 """
 
 import json
+from .constants import SEVERITY_TO_LEVEL
 
 SARIF_SCHEMA = "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
-
-# Severity → SARIF level mapping
-SEVERITY_TO_LEVEL = {
-    "CRITICAL": "error",
-    "HIGH": "error",
-    "MEDIUM": "warning",
-    "LOW": "note",
-}
 
 # Rule metadata catalog — extends what the checker produces
 # Includes fix suggestions for each rule

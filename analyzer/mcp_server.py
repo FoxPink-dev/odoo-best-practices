@@ -28,6 +28,7 @@ import sys
 import os
 import traceback
 from .store import RepositoryStore
+from .constants import SEVERITY_ORDER
 
 
 # ------------------------------------------------------------------
@@ -408,12 +409,11 @@ class MCPServer:
         violations_data = self.store.check_code()
         violations = violations_data.get("violations", [])
         min_severity = arguments.get("severity", "LOW").upper()
-        severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
-        min_level = severity_order.get(min_severity, 3)
+        min_level = SEVERITY_ORDER.get(min_severity, 3)
 
         filtered = [
             v for v in violations
-            if severity_order.get(v.get("severity", "LOW").upper(), 3) <= min_level
+            if SEVERITY_ORDER.get(v.get("severity", "LOW").upper(), 3) <= min_level
         ]
 
         missing_acl = self.store.models_missing_acl()

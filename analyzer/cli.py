@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python3
-"""
-Odoo Repository Analyzer — CLI entry point.
-
-Usage:
-    python -m analyzer.cli path/to/addon                      # Markdown report
-    python -m analyzer.cli path/to/addon --format json         # JSON report
-    python -m analyzer.cli path/to/addon --format sarif        # SARIF for Code Scanning
-    python -m analyzer.cli path/to/addon --check               # AST violations only
-    python -m analyzer.cli path/to/addon --check --baseline    # Check with baseline
-    python -m analyzer.cli path/to/addon --baseline            # Generate baseline.json
-    python -m analyzer.cli path/to/addon --stats               # Rule statistics
-    python -m analyzer.cli path/to/addon --graph               # Inheritance graph
-    python -m analyzer.cli path/to/addon --index               # Build repository index
-"""
-
 import argparse
 import json
 import sys
@@ -24,6 +7,216 @@ from .reporter import Reporter
 from .indexer import RepositoryIndex
 from .baseline import Baseline
 from .graph import build_graph, graph_to_mermaid
+from .constants import SEVERITY_ORDER
+
+
+def _cmd_init(args):
+    from .init_generator import generate
+    results = generate(args.init, ".")
+    for ide_name, filepath in results:
+        print("Generated %s config: %s" % (ide_name, filepath))
+    return 0
+
+
+def _cmd_index(addon_path, args):
+    print("Indexing addon: %s" % (addon_path,), file=sys.stderr)
+    indexer = RepositoryIndex(addon_path)
+    indexer.build()
+    print(indexer.summary(), file=sys.stderr)
+    output_path = args.output or "repository_index"
+    _write_output(indexer.to_json(), output_path, "json")
+    print("\n  AI query examples:", file=sys.stderr)
+    print("    indexer.search_model('sale.order')", file=sys.stderr)
+    print("    indexer.fields_for_model('res.partner')", file=sys.stderr)
+    return 0
+
+
+def _cmd_graph(addon_path):
+    print("Generating inheritance graph for: %s" % (addon_path,), file=sys.stderr)
+    from .parsers.model_parser import ModelParser
+    moparser = ModelParser()
+    moparser.parse_addon(addon_path)
+    graph = build_graph(moparser.get_model_summary())
+    mermaid = graph_to_mermaid(graph)
+    print("\n" + mermaid)
+    return 0
+
+
+def _cmd_baseline(addon_path, args):
+    print("Generating baseline for: %s" % (addon_path,), file=sys.stderr)
+    reporter = Reporter(addon_path)
+    reporter.run()
+    violations = reporter.results.get("check_results", {}).get("violations", [])
+    bl = Baseline(addon_path, baseline_path=args.baseline_path)
+    baseline = bl.generate(violations)
+    print(json.dumps(baseline, indent=2))
+    return 0
+
+
+def _cmd_stats(addon_path):
+    reporter = Reporter(addon_path)
+    results = reporter.run()
+    summary = results.get("summary", {})
+
+    check_results = results.get("check_results", {})
+    violations = check_results.get("violations", [])
+    v_summary = check_results.get("summary", {})
+
+    print("Repository: %s" % (summary.get('module_name', os.path.basename(addon_path)),))
+    print("  Models:     %s" % (summary.get('models', {}).get('total', 0),))
+    print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),))
+    print("  Views:      %s" % (summary.get('views', {}).get('total', 0),))
+    print("  Actions:    %s" % (summary.get('actions', {}).get('total', 0),))
+    print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),))
+    print("  Record Rules: %s" % (summary.get('security', {}).get('record_rules', 0),))
+    print()
+
+    v_total = v_summary.get("total", 0)
+    if v_total > 0:
+        print("Violations by severity:")
+        print("  CRITICAL:  %s" % (v_summary.get('critical', 0),))
+        print("  HIGH:      %s" % (v_summary.get('high', 0),))
+        print("  MEDIUM:    %s" % (v_summary.get('medium', 0),))
+        print("  LOW:       %s" % (v_summary.get('low', 0),))
+        print("  %s" % ('-' * 16,))
+        print("  Total:     %s" % (v_total,))
+        print()
+
+        rule_counts = {}
+        for v in violations:
+            rule = v.get("rule", "unknown")
+            rule_counts[rule] = rule_counts.get(rule, 0) + 1
+        top_rules = sorted(rule_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        if top_rules:
+            print("Top rules violated:")
+            for rule, count in top_rules:
+                sev = "?"
+                for v in violations:
+                    if v.get("rule") == rule:
+                        sev = v.get("severity", "?")
+                        break
+                print("  %s (%s)%s -> %s violation(s)" % (rule, sev, ' ' * max(1, 35 - len(rule)), count,))
+    else:
+        print("  No violations found.")
+    return 0
+
+
+def _cmd_check(addon_path, args):
+    print("Reviewing addon: %s" % (addon_path,), file=sys.stderr)
+    reporter = Reporter(addon_path)
+    check_results = reporter.run_check_only()
+    all_violations = check_results.get("violations", [])
+    summary = check_results.get("summary", {})
+
+    violations = all_violations
+    known_count = 0
+    if args.baseline:
+        bl = Baseline(addon_path, baseline_path=args.baseline_path)
+        loaded = bl.load()
+        if loaded:
+            filtered = bl.filter(all_violations)
+            violations = filtered["new"]
+            known_count = filtered["summary"]["known"]
+            print("  Baseline active: %s known violations suppressed" % (known_count,), file=sys.stderr)
+        else:
+            print("  Warning: no baseline found at %s" % (bl._baseline_path,), file=sys.stderr)
+
+    print("\n  Total violations: %s" % (summary.get('total', 0),), file=sys.stderr)
+    if known_count:
+        print("  Known (suppressed): %s" % (known_count,), file=sys.stderr)
+        print("  New: %s" % (len(violations),), file=sys.stderr)
+    print("    CRITICAL: %s" % (summary.get('critical', 0),), file=sys.stderr)
+    print("    HIGH:     %s" % (summary.get('high', 0),), file=sys.stderr)
+    print("    MEDIUM:   %s" % (summary.get('medium', 0),), file=sys.stderr)
+    print("    LOW:      %s" % (summary.get('low', 0),), file=sys.stderr)
+
+    sorted_violations = sorted(
+        violations,
+        key=lambda x: SEVERITY_ORDER.get(x.get("severity", "LOW"), 99)
+    )
+
+    lines = ["# Code Review Results\n", "| Severity | Rule | File | Line | Confidence | Message |",
+             "|----------|------|------|------|------------|---------|"]
+    for v in sorted_violations:
+        fname = os.path.relpath(v.get("file", ""), addon_path) if v.get("file") else ""
+        sev = v.get("severity", "LOW")
+        rule = v.get("rule", "?")
+        line_num = v.get("line", "?")
+        msg = v.get("message", "?")
+        conf = v.get("confidence", 50)
+        conf_str = "%s%%" % (conf,) if args.confidence else ""
+        lines.append("| **%s** | %s | %s:%s | %s | %s |" % (sev, rule, fname, line_num, conf_str, msg,))
+
+    if known_count:
+        lines.append("\n*Baseline suppressed %s known violations.*\n" % (known_count,))
+
+    output = "\n".join(lines)
+
+    if args.format == "sarif":
+        from .sarif import violations_to_sarif
+        sarif_doc = violations_to_sarif(violations)
+        sarif_doc["runs"][0]["properties"]["baseline"] = {
+            "total_violations": summary.get("total", 0),
+            "suppressed": known_count,
+            "reported": len(violations),
+        }
+        sarif_json = json.dumps(sarif_doc, indent=2)
+        _write_output(sarif_json, args.output, "sarif")
+    else:
+        _write_output(output, args.output, "md")
+    return 0
+
+
+def _cmd_report(addon_path, args):
+    print("Analyzing addon: %s" % (addon_path,), file=sys.stderr)
+    reporter = Reporter(addon_path)
+    results = reporter.run()
+    summary = results.get("summary", {})
+    check_summary = results.get("check_results", {}).get("summary", {})
+
+    print("\n  Module:     %s" % (summary.get('module_name', 'unknown'),), file=sys.stderr)
+    print("  Version:    %s" % (summary.get('manifest_version', 'unknown'),), file=sys.stderr)
+    print("  Models:     %s" % (summary.get('models', {}).get('total', 0),), file=sys.stderr)
+    print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),), file=sys.stderr)
+    print("  Views:      %s" % (summary.get('views', {}).get('total', 0),), file=sys.stderr)
+    print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),), file=sys.stderr)
+
+    if check_summary.get("total", 0) > 0:
+        print("  Violations: %s (C:%s H:%s M:%s L:%s)" % (
+            check_summary.get('total', 0),
+            check_summary.get('critical', 0),
+            check_summary.get('high', 0),
+            check_summary.get('medium', 0),
+            check_summary.get('low', 0),
+        ), file=sys.stderr)
+
+    missing_acl = summary.get("security", {}).get("models_missing_acl", [])
+    if missing_acl:
+        print("  WARNING: %s model(s) missing ACL:" % (len(missing_acl),), file=sys.stderr)
+        for m in missing_acl:
+            print("    - %s" % (m,), file=sys.stderr)
+
+    if args.format == "sarif":
+        check_results = results.get("check_results", {})
+        violations = check_results.get("violations", [])
+        from .sarif import violations_to_sarif
+        sarif_doc = violations_to_sarif(violations)
+        _write_output(json.dumps(sarif_doc, indent=2), args.output, "sarif")
+    elif args.format in ("json", "both"):
+        output = reporter.to_json()
+        _write_output(output, args.output, "json")
+
+    if args.format in ("markdown", "both"):
+        output = reporter.to_markdown() if not args.issues_only else reporter.to_markdown_issues()
+        _write_output(output, args.output, "md")
+
+    issues = results.get("issues", [])
+    if issues:
+        print("\n  Issues: %s found" % (len(issues),), file=sys.stderr)
+        for i in issues:
+            print("    [%s] %s" % (i.get('severity', '?'), i.get('message', '?'),), file=sys.stderr)
+
+    return 0
 
 
 def main():
@@ -92,17 +285,11 @@ def main():
 
     args = parser.parse_args()
 
-    # Normalize sarif format (accept both "sari" and "sarif")
     if args.format == "sari":
         args.format = "sarif"
 
-    # --- Init mode (generate IDE configs, no addon needed) ---
     if args.init:
-        from .init_generator import generate
-        results = generate(args.init, ".")
-        for ide_name, filepath in results:
-            print("Generated %s config: %s" % (ide_name, filepath))
-        return 0
+        return _cmd_init(args)
 
     if not args.addon_dir:
         parser.print_usage()
@@ -115,213 +302,21 @@ def main():
         print("Error: '%s' is not a directory" % (addon_path,), file=sys.stderr)
         sys.exit(1)
 
-    # --- Index mode ---
     if args.index:
-        print("Indexing addon: %s" % (addon_path,), file=sys.stderr)
-        indexer = RepositoryIndex(addon_path)
-        index = indexer.build()
-        print(indexer.summary(), file=sys.stderr)
-        output_path = args.output or "repository_index"
-        _write_output(indexer.to_json(), output_path, "json")
-        print("\n  AI query examples:", file=sys.stderr)
-        print("    indexer.search_model('sale.order')", file=sys.stderr)
-        print("    indexer.fields_for_model('res.partner')", file=sys.stderr)
-        return 0
-
-    # --- Graph mode ---
+        return _cmd_index(addon_path, args)
     if args.graph:
-        print("Generating inheritance graph for: %s" % (addon_path,), file=sys.stderr)
-        from .parsers.model_parser import ModelParser
-        moparser = ModelParser()
-        moparser.parse_addon(addon_path)
-        graph = build_graph(moparser.get_model_summary())
-        mermaid = graph_to_mermaid(graph)
-        print("\n" + mermaid)
-        return 0
-
-    # --- Baseline generation mode ---
+        return _cmd_graph(addon_path)
     if args.baseline and not args.check:
-        print("Generating baseline for: %s" % (addon_path,), file=sys.stderr)
-        reporter = Reporter(addon_path)
-        reporter.run()
-        violations = reporter.results.get("check_results", {}).get("violations", [])
-        bl = Baseline(addon_path, baseline_path=args.baseline_path)
-        baseline = bl.generate(violations)
-        print(json.dumps(baseline, indent=2))
-        return 0
-
-    # --- Stats mode ---
+        return _cmd_baseline(addon_path, args)
     if args.stats:
-        reporter = Reporter(addon_path)
-        results = reporter.run()
-        summary = results.get("summary", {})
-
-        check_results = results.get("check_results", {})
-        violations = check_results.get("violations", [])
-        v_summary = check_results.get("summary", {})
-
-        print("Repository: %s" % (summary.get('module_name', os.path.basename(addon_path)),))
-        print("  Models:     %s" % (summary.get('models', {}).get('total', 0),))
-        print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),))
-        print("  Views:      %s" % (summary.get('views', {}).get('total', 0),))
-        print("  Actions:    %s" % (summary.get('actions', {}).get('total', 0),))
-        print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),))
-        print("  Record Rules: %s" % (summary.get('security', {}).get('record_rules', 0),))
-        print()
-
-        v_total = v_summary.get("total", 0)
-        if v_total > 0:
-            print("Violations by severity:")
-            print("  CRITICAL:  %s" % (v_summary.get('critical', 0),))
-            print("  HIGH:      %s" % (v_summary.get('high', 0),))
-            print("  MEDIUM:    %s" % (v_summary.get('medium', 0),))
-            print("  LOW:       %s" % (v_summary.get('low', 0),))
-            print("  %s" % ('-' * 16,))
-            print("  Total:     %s" % (v_total,))
-            print()
-
-            # Top violated rules
-            rule_counts = {}
-            for v in violations:
-                rule = v.get("rule", "unknown")
-                rule_counts[rule] = rule_counts.get(rule, 0) + 1
-            top_rules = sorted(rule_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-            if top_rules:
-                print("Top rules violated:")
-                for rule, count in top_rules:
-                    sev = "?"
-                    for v in violations:
-                        if v.get("rule") == rule:
-                            sev = v.get("severity", "?")
-                            break
-                    print("  %s (%s)%s → %s violation(s)" % (rule, sev, ' ' * max(1, 35 - len(rule)), count,))
-        else:
-            print("  ✅ No violations found.")
-        return 0
-
-    # --- Check mode (fast, rule engine only) ---
+        return _cmd_stats(addon_path)
     if args.check:
-        print("Reviewing addon: %s" % (addon_path,), file=sys.stderr)
-        reporter = Reporter(addon_path)
-        check_results = reporter.run_check_only()
-        all_violations = check_results.get("violations", [])
-        summary = check_results.get("summary", {})
+        return _cmd_check(addon_path, args)
 
-        # Apply baseline suppression if requested
-        violations = all_violations
-        known_count = 0
-        if args.baseline:
-            bl = Baseline(addon_path, baseline_path=args.baseline_path)
-            loaded = bl.load()
-            if loaded:
-                filtered = bl.filter(all_violations)
-                violations = filtered["new"]
-                known_count = filtered["summary"]["known"]
-                print("  Baseline active: %s known violations suppressed" % (known_count,), file=sys.stderr)
-            else:
-                print("  Warning: no baseline found at %s" % (bl._baseline_path,), file=sys.stderr)
-
-        print("\n  Total violations: %s" % (summary.get('total', 0),), file=sys.stderr)
-        if known_count:
-            print("  Known (suppressed): %s" % (known_count,), file=sys.stderr)
-            print("  New: %s" % (len(violations),), file=sys.stderr)
-        print("    CRITICAL: %s" % (summary.get('critical', 0),), file=sys.stderr)
-        print("    HIGH:     %s" % (summary.get('high', 0),), file=sys.stderr)
-        print("    MEDIUM:   %s" % (summary.get('medium', 0),), file=sys.stderr)
-        print("    LOW:      %s" % (summary.get('low', 0),), file=sys.stderr)
-
-        # Output violations table
-        sev_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
-        sorted_violations = sorted(
-            violations,
-            key=lambda x: sev_order.get(x.get("severity", "LOW"), 99)
-        )
-
-        lines = ["# Code Review Results\n", "| Severity | Rule | File | Line | Confidence | Message |",
-                 "|----------|------|------|------|------------|---------|"]
-        for v in sorted_violations:
-            fname = os.path.relpath(v.get("file", ""), addon_path) if v.get("file") else ""
-            sev = v.get("severity", "LOW")
-            rule = v.get("rule", "?")
-            line_num = v.get("line", "?")
-            msg = v.get("message", "?")
-            conf = v.get("confidence", 50)
-            conf_str = "%s%%" % (conf,) if args.confidence else ""
-            lines.append("| **%s** | %s | %s:%s | %s | %s |" % (sev, rule, fname, line_num, conf_str, msg,))
-
-        if known_count:
-            lines.append("\n*Baseline suppressed %s known violations.*\n" % (known_count,))
-
-        output = "\n".join(lines)
-
-        if args.format == "sarif":
-            from .sarif import violations_to_sarif
-            sarif_doc = violations_to_sarif(violations)
-            sarif_doc["runs"][0]["properties"]["baseline"] = {
-                "total_violations": summary.get("total", 0),
-                "suppressed": known_count,
-                "reported": len(violations),
-            }
-            sarif_json = json.dumps(sarif_doc, indent=2)
-            _write_output(sarif_json, args.output, "sarif")
-        else:
-            _write_output(output, args.output, "md")
-        return 0
-
-    # --- Full report mode ---
-    print("Analyzing addon: %s" % (addon_path,), file=sys.stderr)
-    reporter = Reporter(addon_path)
-    results = reporter.run()
-    summary = results.get("summary", {})
-    check_summary = results.get("check_results", {}).get("summary", {})
-
-    print("\n  Module:     %s" % (summary.get('module_name', 'unknown'),), file=sys.stderr)
-    print("  Version:    %s" % (summary.get('manifest_version', 'unknown'),), file=sys.stderr)
-    print("  Models:     %s" % (summary.get('models', {}).get('total', 0),), file=sys.stderr)
-    print("  Fields:     %s" % (summary.get('fields', {}).get('total', 0),), file=sys.stderr)
-    print("  Views:      %s" % (summary.get('views', {}).get('total', 0),), file=sys.stderr)
-    print("  ACLs:       %s" % (summary.get('security', {}).get('acls', 0),), file=sys.stderr)
-
-    if check_summary.get("total", 0) > 0:
-        print("  Violations: %s (C:%s H:%s M:%s L:%s)" % (
-            check_summary.get('total', 0),
-            check_summary.get('critical', 0),
-            check_summary.get('high', 0),
-            check_summary.get('medium', 0),
-            check_summary.get('low', 0),
-        ), file=sys.stderr)
-
-    missing_acl = summary.get("security", {}).get("models_missing_acl", [])
-    if missing_acl:
-        print("  WARNING: %s model(s) missing ACL:" % (len(missing_acl),), file=sys.stderr)
-        for m in missing_acl:
-            print("    - %s" % (m,), file=sys.stderr)
-
-    if args.format == "sarif":
-        check_results = results.get("check_results", {})
-        violations = check_results.get("violations", [])
-        from .sarif import violations_to_sarif
-        sarif_doc = violations_to_sarif(violations)
-        _write_output(json.dumps(sarif_doc, indent=2), args.output, "sarif")
-    elif args.format == "json" or args.format == "both":
-        output = reporter.to_json()
-        _write_output(output, args.output, "json")
-
-    if args.format in ("markdown", "both"):
-        output = reporter.to_markdown() if not args.issues_only else reporter.to_markdown_issues()
-        _write_output(output, args.output, "md")
-
-    issues = results.get("issues", [])
-    if issues:
-        print("\n  Issues: %s found" % (len(issues),), file=sys.stderr)
-        for i in issues:
-            print("    [%s] %s" % (i['severity'], i['message'],), file=sys.stderr)
-
-    return 0
+    return _cmd_report(addon_path, args)
 
 
 def _write_output(content, output_path, ext):
-    """Write content to file or stdout."""
     if output_path:
         base, _ = os.path.splitext(output_path)
         final_path = "%s.%s" % (base, ext,)

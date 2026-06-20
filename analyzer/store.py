@@ -227,8 +227,11 @@ class RepositoryStore:
         acl_models = set()
         for acl in self.list_acls():
             ref = acl.get("model_id", "")
-            if ref and ref.startswith("model_"):
-                acl_models.add(ref[6:].replace("_", "."))
+            if ref:
+                if ref.startswith("model_"):
+                    acl_models.add(ref[6:].replace("_", "."))
+                else:
+                    acl_models.add(ref.replace("_", "."))
         declared = {m.get("tech_name", "?") for m in self.list_models()}
         return list(declared - acl_models)
 

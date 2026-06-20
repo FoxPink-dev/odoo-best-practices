@@ -2,7 +2,7 @@
 import json
 import os
 from .parsers import ManifestParser, ModelParser, ViewParser, SecurityParser
-from .graph import InheritanceGraph, build_graph, graph_to_mermaid
+from .graph import build_graph, graph_to_mermaid
 from .checker import Checker
 
 

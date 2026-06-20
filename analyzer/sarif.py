@@ -14,7 +14,7 @@ import json
 from .constants import SEVERITY_TO_LEVEL
 
 SARIF_SCHEMA = "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json"
-FALLBACK_VERSION = "1.0.0-beta.1"
+FALLBACK_VERSION = "1.0.0-beta.2"
 
 # Rule metadata catalog — extends what the checker produces
 # Includes fix suggestions for each rule

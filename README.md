@@ -408,7 +408,7 @@ odoo-best-practices/
 ├── versions/{14,15,16,17,18,19}/ # Version-specific guides
 ├── docs/                          # 60 official Odoo docs (14-19)
 ├── analyzer/                      # Python static analysis engine
-│   ├── cli.py                     # CLI: 8 sub-commands
+│   ├── cli.py                     # CLI: 7 sub-commands
 │   ├── checker.py                 # AST rule engine (4 checks)
 │   ├── constants.py               # Shared severity constants
 │   ├── indexer.py                 # Repository index builder
@@ -430,7 +430,6 @@ odoo-best-practices/
 ├── .npmignore
 ├── .github/
 │   ├── workflows/odoo-review.yml  # PR review CI
-│   ├── workflows/publish-pypi.yml # PyPI publish (requires Trusted Publisher)
 │   ├── workflows/publish-npm.yml  # npm publish
 │   └── actions/odoo-review/       # Docker action for GitHub CI
 │       └── entrypoint.py

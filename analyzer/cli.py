@@ -37,9 +37,9 @@ def main():
     )
     parser.add_argument(
         "--format",
-        choices=["json", "markdown", "both", "sari", "sarif"],
+        choices=["json", "markdown", "both", "sarif", "sari"],
         default="markdown",
-        help="Output format (default: markdown)",
+        help="Output format: json, markdown, both, sarif (default: markdown)",
     )
     parser.add_argument(
         "-o", "--output",
@@ -91,6 +91,10 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Normalize sarif format (accept both "sari" and "sarif")
+    if args.format == "sari":
+        args.format = "sarif"
 
     # --- Init mode (generate IDE configs, no addon needed) ---
     if args.init:
@@ -250,7 +254,7 @@ def main():
 
         output = "\n".join(lines)
 
-        if args.format == "sari":
+        if args.format == "sarif":
             from .sarif import violations_to_sarif
             sarif_doc = violations_to_sarif(violations)
             sarif_doc["runs"][0]["properties"]["baseline"] = {
@@ -259,7 +263,7 @@ def main():
                 "reported": len(violations),
             }
             sarif_json = json.dumps(sarif_doc, indent=2)
-            _write_output(sarif_json, args.output, "sari")
+            _write_output(sarif_json, args.output, "sarif")
         else:
             _write_output(output, args.output, "md")
         return 0
@@ -293,17 +297,17 @@ def main():
         for m in missing_acl:
             print("    - %s" % (m,), file=sys.stderr)
 
-    if args.format == "sari":
+    if args.format == "sarif":
         check_results = results.get("check_results", {})
         violations = check_results.get("violations", [])
         from .sarif import violations_to_sarif
         sarif_doc = violations_to_sarif(violations)
-        _write_output(json.dumps(sarif_doc, indent=2), args.output, "sari")
+        _write_output(json.dumps(sarif_doc, indent=2), args.output, "sarif")
     elif args.format == "json" or args.format == "both":
         output = reporter.to_json()
         _write_output(output, args.output, "json")
 
-    if args.format == "markdown" or args.format == "both" or args.format == "json":
+    if args.format in ("markdown", "both"):
         output = reporter.to_markdown() if not args.issues_only else reporter.to_markdown_issues()
         _write_output(output, args.output, "md")
 

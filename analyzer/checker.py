@@ -82,18 +82,18 @@ class Checker:
         for model_name, method_list in methods.items():
             for method_info in method_list:
                 code = method_info.get("code", "")
-            lines = code.split("\n")
-            for i, line in enumerate(lines, 1):
-                line_stripped = line.strip()
-                if "self.env" in line_stripped and "sudo()" in line_stripped:
-                    self.violations.append({
-                        "severity": "HIGH",
-                        "rule": "orm-sudo-sparingly",
-                        "message": "sudo() used in method '%s':%s" % (method_name, method_info.get('line', 1) + i - 1,),
-                        "file": method_info.get("file", ""),
-                        "line": method_info.get("line", 1) + i - 1,
-                        "confidence": 60,
-                    })
+                lines = code.split("\n")
+                for i, line in enumerate(lines, 1):
+                    line_stripped = line.strip()
+                    if "self.env" in line_stripped and "sudo()" in line_stripped:
+                        self.violations.append({
+                            "severity": "HIGH",
+                            "rule": "orm-sudo-sparingly",
+                            "message": "sudo() used in method '%s':%s" % (method_info.get('name', '?'), method_info.get('line', 1) + i - 1,),
+                            "file": method_info.get("file", ""),
+                            "line": method_info.get("line", 1) + i - 1,
+                            "confidence": 60,
+                        })
 
     def _compute_summary(self):
         by_sev = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}

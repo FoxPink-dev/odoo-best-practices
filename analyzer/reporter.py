@@ -66,9 +66,7 @@ class Reporter:
         self.results["check_results"] = {
             "violations": violations,
             "summary": checker.summary(),
-            "by_severity": {
-                k: len(v) for k, v in checker.by_severity().items()
-            },
+            "by_severity": checker.by_severity(),
         }
 
     def _parse_manifest(self):

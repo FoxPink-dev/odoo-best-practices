@@ -156,7 +156,7 @@ def graph_to_mermaid(graph_result, graph_type="inheritance"):
     """
     lines = []
 
-    if graph_type == "inheritance" or "inheritance" in graph_result:
+    if graph_type == "inheritance" and "inheritance" in graph_result:
         lines.append("```mermaid")
         lines.append("graph TD")
         graph = graph_result.get("inheritance", {})

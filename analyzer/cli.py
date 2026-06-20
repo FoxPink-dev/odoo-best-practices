@@ -32,6 +32,7 @@ def main():
     )
     parser.add_argument(
         "addon_dir",
+        nargs="?",
         help="Path to the Odoo addon directory to analyze",
     )
     parser.add_argument(
@@ -83,8 +84,27 @@ def main():
         action="store_true",
         help="Show confidence scores for violations",
     )
+    parser.add_argument(
+        "--init",
+        choices=["opencode", "claude", "cursor", "kiro", "windsurf", "all"],
+        help="Generate AI IDE config files for odoo-best-practices in the current project",
+    )
 
     args = parser.parse_args()
+
+    # --- Init mode (generate IDE configs, no addon needed) ---
+    if args.init:
+        from .init_generator import generate
+        results = generate(args.init, ".")
+        for ide_name, filepath in results:
+            print("Generated %s config: %s" % (ide_name, filepath))
+        return 0
+
+    if not args.addon_dir:
+        parser.print_usage()
+        print("Error: addon_dir is required", file=sys.stderr)
+        sys.exit(1)
+
     addon_path = os.path.abspath(args.addon_dir)
 
     if not os.path.isdir(addon_path):

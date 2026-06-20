@@ -395,26 +395,15 @@ class RepositoryStore:
     def repository_summary(self):
         """Return a full summary dict of the entire repository."""
         self._ensure_loaded()
-        if self._all_results:
-            return self._all_results.get("summary", {})
-
-        models = self.list_models()
-        fields = self._index.get("fields", [])
-        views = self.list_views()
-        actions = self.list_actions()
-        menus = self._index.get("menus", [])
-        acls = self.list_acls()
-        violations = self.check_code()
-
         return {
             "addon": os.path.basename(self.addon_dir),
-            "models": len(models),
-            "fields": len(fields),
-            "views": len(views),
-            "actions": len(actions),
-            "menus": len(menus),
-            "acls": len(acls),
-            "violations": violations.get("summary", {}).get("total", 0),
+            "models": len(self.list_models()),
+            "fields": len(self._index.get("fields", [])),
+            "views": len(self.list_views()),
+            "actions": len(self.list_actions()),
+            "menus": len(self._index.get("menus", [])),
+            "acls": len(self.list_acls()),
+            "violations": self.check_code().get("summary", {}).get("total", 0),
         }
 
     # ------------------------------------------------------------------

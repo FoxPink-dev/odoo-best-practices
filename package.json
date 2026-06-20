@@ -1,8 +1,14 @@
 {
   "name": "@foxpink-dev/odoo-best-practices",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Odoo development best practices — init command for AI IDE config generation",
-  "keywords": ["odoo", "best-practices", "code-review", "linting", "mcp"],
+  "keywords": [
+    "odoo",
+    "best-practices",
+    "code-review",
+    "linting",
+    "mcp"
+  ],
   "license": "MIT",
   "author": "FoxPink",
   "repository": {

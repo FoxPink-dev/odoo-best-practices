@@ -140,9 +140,9 @@ class RepositoryStore:
         for m in self.list_models():
             inherit = m.get("inherit", [])
             if isinstance(inherit, list) and model_name in inherit:
-                extending.append(m["tech_name"])
+                extending.append(m.get("tech_name", "?"))
             elif inherit == model_name:
-                extending.append(m["tech_name"])
+                extending.append(m.get("tech_name", "?"))
         return sorted(extending)
 
     # ------------------------------------------------------------------
@@ -229,7 +229,7 @@ class RepositoryStore:
             ref = acl.get("model_id", "")
             if ref and ref.startswith("model_"):
                 acl_models.add(ref[6:].replace("_", "."))
-        declared = {m["tech_name"] for m in self.list_models()}
+        declared = {m.get("tech_name", "?") for m in self.list_models()}
         return list(declared - acl_models)
 
     def acls_for_model(self, model_name):

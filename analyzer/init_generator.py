@@ -6,7 +6,13 @@ import shutil
 _SKILL_NAME = "odoo-best-practices"
 _VERSION = "2.0.0"
 _AUTHOR = "FoxPink"
-_RULES_COUNT = 118
+
+
+def _rules_count():
+    rules_dir = os.path.join(_project_root(), "rules")
+    if os.path.isdir(rules_dir):
+        return len([f for f in os.listdir(rules_dir) if f.endswith(".md")])
+    return 0
 
 _IDE_CONFIGS = {
     "opencode": "OpenCode",
@@ -73,7 +79,7 @@ def generate_opencode(output_dir):
             "static": {
                 "parsers": ["manifest", "model", "view", "security"],
                 "engine": "AST (no eval, no runtime)",
-                "rules": _RULES_COUNT,
+                "rules": _rules_count(),
                 "anti_patterns": 12,
                 "supported_versions": ["14", "15", "16", "17", "18", "19"],
             }

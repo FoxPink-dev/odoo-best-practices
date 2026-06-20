@@ -199,13 +199,13 @@ class Reporter:
             for method in methods:
                 decorators = method.get("decorators", [])
                 # write() inside compute
-                if method["name"] == "write" and any("api.depends" in d for d in decorators):
+                if method.get("name") == "write" and any("api.depends" in d for d in decorators):
                     issues.append({
                         "severity": "HIGH",
                         "rule": "orm-computed-fields",
                         "message": "Model '%s': write() with @api.depends" % model_name,
                         "model": model_name,
-                        "method": method["name"],
+                        "method": method.get("name", "?"),
                     })
 
         self.results["issues"] = issues
@@ -249,7 +249,7 @@ class Reporter:
                 inherit_str = ", ".join(info.get("inherit", [])) or "-"
                 fields_count = len(self.results["fields"].get(name, []))
                 lines.append(
-                    f"| {name} | {info['class_name']} | {info['file']} | {inherit_str} | {fields_count} |"
+                    f"| {name} | {info.get('class_name', '?')} | {info.get('file', '?')} | {inherit_str} | {fields_count} |"
                 )
             lines.append("")
 
@@ -275,7 +275,7 @@ class Reporter:
             lines.append("|----|------|-------|------|----------|")
             for v in views[:20]:  # limit table
                 lines.append(
-                    f"| {v['id']} | {v['name']} | {v['model']} | {v['type']} | {v.get('inherit_id', '-')} |"
+                    f"| {v.get('id', '?')} | {v.get('name', '?')} | {v.get('model', '?')} | {v.get('type', '?')} | {v.get('inherit_id', '-')} |"
                 )
             lines.append("")
 
@@ -292,7 +292,7 @@ class Reporter:
             lines.append("|----|-------|-------|------|-------|--------|--------|")
             for a in acls[:15]:
                 lines.append(
-                    f"| {a['id']} | {a['model_id']} | {a['group_id']} | {a['perm_read']} | {a['perm_write']} | {a['perm_create']} | {a['perm_unlink']} |"
+                    f"| {a.get('id', '?')} | {a.get('model_id', '?')} | {a.get('group_id', '?')} | {a.get('perm_read', '?')} | {a.get('perm_write', '?')} | {a.get('perm_create', '?')} | {a.get('perm_unlink', '?')} |"
                 )
             lines.append("")
 
@@ -304,7 +304,7 @@ class Reporter:
             lines.append("|----------|------|---------|")
             for issue in issues:
                 lines.append(
-                    f"| **{issue['severity']}** | {issue['rule']} | {issue['message']} |"
+                    f"| **{issue.get('severity', '?')}** | {issue.get('rule', '?')} | {issue.get('message', '?')} |"
                 )
             lines.append("")
         else:
@@ -338,7 +338,7 @@ class Reporter:
                 fname = v.get("file", "")
                 line = v.get("line", "?")
                 parts.append(
-                    f"| **{v['severity']}** | {v['rule']} | {fname}:{line} | {v['message']} |"
+                    f"| **{v.get('severity', '?')}** | {v.get('rule', '?')} | {fname}:{line} | {v.get('message', '?')} |"
                 )
             parts.append("")
         else:

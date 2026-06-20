@@ -41,10 +41,13 @@ class SecurityParser:
             for fname in files:
                 if fname.endswith(".csv"):
                     filepath = os.path.join(root, fname)
-                    with open(filepath, "r", encoding="utf-8") as f:
-                        header = f.readline()
-                        if "id,name,model_id,group_id,perm_read" in header.lower():
-                            self._parse_acl_csv(filepath)
+                    try:
+                        with open(filepath, "r", encoding="utf-8") as f:
+                            header = f.readline()
+                            if "id,name,model_id,group_id,perm_read" in header.lower():
+                                self._parse_acl_csv(filepath)
+                    except (IOError, UnicodeDecodeError):
+                        pass
 
     def _parse_acl_csv(self, filepath):
         """Parse an ACL CSV file (ir.model.access.csv)."""

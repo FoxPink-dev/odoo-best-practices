@@ -149,6 +149,10 @@ def build_graph(model_data, module_deps=None):
     return result
 
 
+def _sanitize(name):
+    return name.replace(".", "_").replace("-", "_")
+
+
 def graph_to_mermaid(graph_result, graph_type="inheritance"):
     """Convert a graph result to Mermaid.js diagram format.
 
@@ -166,16 +170,16 @@ def graph_to_mermaid(graph_result, graph_type="inheritance"):
             for root in roots:
                 lines.append("    subgraph " + root + "_family")
                 for model, parents in graph.items():
-                    if model in graph_result.get("roots", []):
+                    if model in roots:
                         continue
                     for p in parents:
-                        p_clean = p.replace(".", "_").replace("-", "_")
-                        m_clean = model.replace(".", "_").replace("-", "_")
+                        p_clean = _sanitize(p)
+                        m_clean = _sanitize(model)
                         lines.append("    " + p_clean + "[" + p + "] --> " + m_clean + "[" + model + "]")
                 lines.append("    end")
         # Root models
         for root in roots:
-            r_clean = root.replace(".", "_").replace("-", "_")
+            r_clean = _sanitize(root)
             lines.append("    " + r_clean + "[" + root + "]")
         lines.append("```")
 
@@ -184,8 +188,8 @@ def graph_to_mermaid(graph_result, graph_type="inheritance"):
         lines.append("graph LR")
         for module, deps in graph_result.get("dependency", {}).items():
             for dep in deps:
-                m_clean = module.replace(".", "_").replace("-", "_")
-                d_clean = dep.replace(".", "_").replace("-", "_")
+                m_clean = _sanitize(module)
+                d_clean = _sanitize(dep)
                 lines.append("    " + d_clean + "[" + dep + "] --> " + m_clean + "[" + module + "]")
         lines.append("```")
 

@@ -147,7 +147,7 @@ def main():
         violations = reporter.results.get("check_results", {}).get("violations", [])
         bl = Baseline(addon_path, baseline_path=args.baseline_path)
         baseline = bl.generate(violations)
-        print(json.dumps(baseline, indent=2), file=sys.stderr)
+        print(json.dumps(baseline, indent=2))
         return 0
 
     # --- Stats mode ---

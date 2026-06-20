@@ -8,7 +8,7 @@ Static analysis engine + domain knowledge platform + MCP server for Odoo module 
 
 ---
 
-## Quick Start (5 phút)
+## Quick Start (5 minutes)
 
 ```bash
 # 1. Clone
@@ -31,7 +31,7 @@ Violations: 3 violations found
   LOW:      0
 ```
 
-> Nếu bạn thấy output như trên, bạn đã chạy được analyzer thành công trong **5 phút**.
+> If you see output like above, the analyzer is working. You just ran your first Odoo analysis in **5 minutes**.
 
 ### Try with demo data
 
@@ -45,7 +45,7 @@ python -m analyzer.cli tests/fixtures/demo_addon --check --format json
 
 ### 1. Add workflow file
 
-Tạo `.github/workflows/odoo-review.yml`:
+Create `.github/workflows/odoo-review.yml`:
 
 ```yaml
 name: Odoo Review
@@ -84,14 +84,14 @@ jobs:
         continue-on-error: true
 ```
 
-### 2. Kết quả trên PR
+### 2. PR Results
 
-Sau khi chạy, bạn sẽ thấy trong PR:
+After running, you will see in the PR:
 
-| Tính năng | Hiển thị |
-|-----------|----------|
-| PR Comment | Bảng violations theo severity với file:line |
-| Annotations | Inline error/warning trên từng dòng code |
+| Feature | Display |
+|---------|---------|
+| PR Comment | Violations table grouped by severity with file:line |
+| Annotations | Inline error/warning markers on each code line |
 | Code Scanning | SARIF upload → GitHub Security tab |
 
 ```
@@ -112,7 +112,7 @@ Sau khi chạy, bạn sẽ thấy trong PR:
 └─────────────────────────────────────────────┘
 ```
 
-> **Tip**: Lần đầu chạy trên legacy repo, dùng `generate-baseline: 'true'` để baseline existing violations.
+> **Tip**: On first run against a legacy repo, use `generate-baseline: 'true'` to baseline existing violations.
 
 ---
 
@@ -179,9 +179,9 @@ Sau khi chạy, bạn sẽ thấy trong PR:
 ### Example: AI-assisted debugging
 
 ```
-User: "Tại sao sale.order không có ACL?"
+User: "Why does sale.order have no ACL?"
 → Agent calls `search_model("sale.order")` + `models_missing_acl`
-→ "Model sale.order được định nghĩa tại models/sale.py:10 nhưng chưa có ACL entry trong security/ir.model.access.csv"
+→ "Model sale.order is defined at models/sale.py:10 but has no ACL entry in security/ir.model.access.csv"
 ```
 
 ---
@@ -254,24 +254,24 @@ Top rules violated:
 
 ## Confidence Score
 
-Mỗi violation có confidence score giúp bạn ưu tiên review:
+Each violation includes a confidence score to help prioritize review:
 
 ```
 search-inside-loop
   Severity:   CRITICAL
-  Confidence: 98%              ← Tỷ lệ chính xác cao → ưu tiên fix
+  Confidence: 98%              ← High accuracy → fix immediately
 
 missing-index
   Severity:   MEDIUM
-  Confidence: 60%              ← Có thể false positive → cần review
+  Confidence: 60%              ← Possible false positive → review needed
 ```
 
 | Confidence | Meaning | Action |
 |-----------|---------|--------|
-| 90-100% | Static analysis chắc chắn | Fix ngay |
-| 70-89% | Pattern rõ ràng | Review nhanh |
-| 50-69% | Heuristic-based | Cần kiểm tra |
-| < 50% | Low confidence | Có thể bỏ qua |
+| 90-100% | Static analysis certainty | Fix immediately |
+| 70-89% | Clear pattern match | Quick review |
+| 50-69% | Heuristic-based | Needs verification |
+| < 50% | Low confidence | May ignore |
 
 ---
 
@@ -279,7 +279,7 @@ missing-index
 
 ### 1. Code Review Automation
 
-GitHub Action tự động review mọi PR:
+GitHub Action automatically reviews every PR:
 
 ```yaml
 # .github/workflows/odoo-review.yml
@@ -292,28 +292,28 @@ GitHub Action tự động review mọi PR:
 ### 2. Legacy Repository Onboarding
 
 ```bash
-# Bước 1: Baseline existing violations
+# Step 1: Baseline existing violations
 python -m analyzer.cli /path/to/legacy/addon --baseline
-# → Tạo odoo-baseline.json với 387 violations
+# → Creates odoo-baseline.json with 387 accepted violations
 
-# Bước 2: Từ nay chỉ báo violations MỚI
+# Step 2: Only NEW violations are reported from now on
 python -m analyzer.cli /path/to/legacy/addon --check --baseline
-# → Chỉ còn 3 violations mới
+# → Only 3 new violations remain
 ```
 
 ### 3. AI-assisted Development
 
-MCP server cho phép AI agents hiểu codebase Odoo của bạn:
+MCP server enables AI agents to understand your Odoo codebase:
 
 ```
 → "Explain model sale.order"
-→ Agent trả về: fields, methods, views, inheritance chain, knowledge docs
+→ Agent returns: fields, methods, views, inheritance chain, knowledge docs
 ```
 
 ### 4. CI Pipeline Quality Gate
 
 ```yaml
-# Fail build nếu có CRITICAL hoặc HIGH violations
+# Fail build if CRITICAL or HIGH violations exist
 - name: Quality Gate
   run: |
     python -m analyzer.cli . --check --format json -o report.json
@@ -324,7 +324,7 @@ MCP server cho phép AI agents hiểu codebase Odoo của bạn:
 
 ## Baseline System
 
-Cho phép onboarding legacy repo mà không bị淹没 bởi existing violations.
+Enables onboarding legacy repositories without being overwhelmed by existing violations.
 
 ```bash
 # Generate baseline
@@ -334,7 +334,7 @@ python -m analyzer.cli /path/to/addon --baseline
 python -m analyzer.cli /path/to/addon --check --baseline
 ```
 
-Baseline lưu dưới dạng `odoo-baseline.json`:
+Baseline data is stored as `odoo-baseline.json`:
 
 ```json
 {

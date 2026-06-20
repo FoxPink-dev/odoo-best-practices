@@ -103,6 +103,7 @@ def main():
     fail_on_high = sys.argv[3].lower() == "true" if len(sys.argv) > 3 else True
     generate_baseline = sys.argv[4].lower() == "true" if len(sys.argv) > 4 else False
     baseline_path = sys.argv[5] if len(sys.argv) > 5 else ""
+    use_baseline = sys.argv[6].lower() == "true" if len(sys.argv) > 6 else False
 
     github_token = os.environ.get("GITHUB_TOKEN", "")
     github_repo = os.environ.get("GITHUB_REPOSITORY", "")
@@ -143,7 +144,7 @@ def main():
         v_summary = violations.get("summary", {})
 
         # Apply baseline suppression if requested
-        if "baseline" in os.environ and os.environ["baseline"].lower() == "true":
+        if use_baseline:
             from analyzer.baseline import Baseline
             bl = Baseline(abs_addon, baseline_path=baseline_path)
             loaded = bl.load()
@@ -175,9 +176,10 @@ def main():
             annotation_level = "error" if sev in ("CRITICAL", "HIGH") else "warning"
             print(f"::{annotation_level} file={file},line={line},title={sev}: {rule}::{msg}")
 
-    # Post PR comment
-    report = format_violations(violations_list)
-    post_pr_comment(github_token, github_repo, pr_number, report)
+    # Post PR comment (skip during baseline generation)
+    if not generate_baseline:
+        report = format_violations(violations_list)
+        post_pr_comment(github_token, github_repo, pr_number, report)
 
     # Write SARIF output for GitHub Code Scanning
     sarif_path = os.path.join(workspace, "odoo-review-results.sarif")

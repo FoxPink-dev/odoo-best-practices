@@ -57,13 +57,13 @@ class TestCheckerRawSQL:
 class TestCheckerSudo:
     def test_detects_sudo(self, full_checker_results):
         sudo_violations = [v for v in full_checker_results["violations"]
-                           if v["rule"] == "orm-sudo-sparingly"]
+                           if v["rule"] == "security-sudo-usage"]
         action_sudo = [v for v in sudo_violations if "action_sudo_method" in v.get("message", "")]
         assert len(action_sudo) >= 1
 
     def test_sudo_line_numbers(self, full_checker_results):
         sudo_violations = [v for v in full_checker_results["violations"]
-                           if v["rule"] == "orm-sudo-sparingly"]
+                           if v["rule"] == "security-sudo-usage"]
         if sudo_violations:
             assert all(v.get("line", 0) > 0 for v in sudo_violations)
 

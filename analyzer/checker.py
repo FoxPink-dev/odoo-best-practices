@@ -88,7 +88,7 @@ class Checker:
                     if "self.env" in line_stripped and "sudo()" in line_stripped:
                         self.violations.append({
                             "severity": "HIGH",
-                            "rule": "orm-sudo-sparingly",
+                            "rule": "security-sudo-usage",
                             "message": "sudo() used in method '%s':%s" % (method_info.get('name', '?'), method_info.get('line', 1) + i - 1,),
                             "file": method_info.get("file", ""),
                             "line": method_info.get("line", 1) + i - 1,

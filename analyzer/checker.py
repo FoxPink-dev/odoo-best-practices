@@ -5,9 +5,6 @@ Walks parsed Python AST + parsed metadata to detect rule violations.
 Each rule is a stateless check function that receives analysis context.
 """
 
-from .graph import InheritanceGraph
-
-
 class Checker:
     """Detect potential issues in the addon codebase."""
 
@@ -31,7 +28,13 @@ class Checker:
         models = self.results.get("models", {})
         model_names = list(models.keys())
         acls = self.results.get("acls", [])
-        acl_models = set(a.get("model", "") for a in acls)
+        acl_models = set()
+        for a in acls:
+            ref = a.get("model_id", "")
+            if ref.startswith("model_"):
+                acl_models.add(ref[6:].replace("_", "."))
+            elif ref:
+                acl_models.add(ref.replace("_", "."))
 
         for m in model_names:
             if m not in acl_models:
@@ -46,40 +49,43 @@ class Checker:
 
     def _check_nplus1(self):
         methods = self.results.get("methods", {})
-        for method_name, method_info in methods.items():
-            code = method_info.get("code", "")
-            if "for " in code and "search(" in code:
-                self.violations.append({
-                    "severity": "CRITICAL",
-                    "rule": "orm-no-n-plus-1",
-                    "message": "search() inside loop in method '%s'" % (method_name,),
-                    "file": method_info.get("file", ""),
-                    "line": method_info.get("line", 1),
-                    "confidence": 85,
-                })
+        for model_name, method_list in methods.items():
+            for method_info in method_list:
+                code = method_info.get("code", "")
+                if "for " in code and "search(" in code:
+                    self.violations.append({
+                        "severity": "CRITICAL",
+                        "rule": "orm-no-n-plus-1",
+                        "message": "search() inside loop in method '%s'" % (method_info.get("name", "?"),),
+                        "file": method_info.get("file", ""),
+                        "line": method_info.get("line", 1),
+                        "confidence": 85,
+                    })
 
     def _check_raw_sql(self):
         methods = self.results.get("methods", {})
-        for method_name, method_info in methods.items():
-            code = method_info.get("code", "")
-            if "cr.execute" in code or "execute(" in code:
-                self.violations.append({
-                    "severity": "HIGH",
-                    "rule": "orm-raw-sql",
-                    "message": "Raw SQL query in method '%s'" % (method_name,),
-                    "file": method_info.get("file", ""),
-                    "line": method_info.get("line", 1),
-                    "confidence": 70,
-                })
+        for model_name, method_list in methods.items():
+            for method_info in method_list:
+                code = method_info.get("code", "")
+                if "self.env.cr.execute(" in code or "cr.execute(" in code:
+                    self.violations.append({
+                        "severity": "HIGH",
+                        "rule": "orm-raw-sql",
+                        "message": "Raw SQL query in method '%s'" % (method_info.get("name", "?"),),
+                        "file": method_info.get("file", ""),
+                        "line": method_info.get("line", 1),
+                        "confidence": 70,
+                    })
 
     def _check_sudo(self):
         methods = self.results.get("methods", {})
-        for method_name, method_info in methods.items():
-            code = method_info.get("code", "")
+        for model_name, method_list in methods.items():
+            for method_info in method_list:
+                code = method_info.get("code", "")
             lines = code.split("\n")
             for i, line in enumerate(lines, 1):
                 line_stripped = line.strip()
-                if line_stripped.startswith("self.env") and "sudo()" in line_stripped:
+                if "self.env" in line_stripped and "sudo()" in line_stripped:
                     self.violations.append({
                         "severity": "HIGH",
                         "rule": "orm-sudo-sparingly",

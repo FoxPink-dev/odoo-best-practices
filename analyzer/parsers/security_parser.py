@@ -140,12 +140,12 @@ class SecurityParser:
         fields = {}
         for field_elem in record.findall("field"):
             name = field_elem.get("name", "")
-            ref = field_elem.get("re", "")
+            ref = field_elem.get("ref", "")
             eval_val = field_elem.get("eval", "")
             if ref:
-                value = {"re": ref}
+                value = ref
             elif eval_val:
-                value = {"eval": eval_val}
+                value = eval_val
             else:
                 value = field_elem.text or ""
             fields[name] = value

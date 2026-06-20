@@ -66,8 +66,8 @@ class ViewParser:
     def _parse_view_record(self, record, record_id, rel_path):
         """Parse a ir.ui.view record for view metadata."""
         fields = self._record_fields(record)
-        inherit_id = fields.get("inherit_id", {})
-        inherit_ref = inherit_id.get("re", "") if isinstance(inherit_id, dict) else ""
+        inherit_id = fields.get("inherit_id", "")
+        inherit_ref = inherit_id.get("ref", "") if isinstance(inherit_id, dict) else (inherit_id if isinstance(inherit_id, str) else "")
 
         arch = fields.get("arch", "")
         view_type = self._detect_view_type(arch, fields)
@@ -118,13 +118,12 @@ class ViewParser:
         fields = {}
         for field_elem in record.findall("field"):
             name = field_elem.get("name", "")
-            ref = field_elem.get("re", "")
+            ref = field_elem.get("ref", "")
             eval_val = field_elem.get("eval", "")
-            # Get text content or ref/eval
             if ref:
-                value = {"re": ref}
+                value = ref
             elif eval_val:
-                value = {"eval": eval_val}
+                value = eval_val
             else:
                 value = field_elem.text or ""
                 if field_elem.get("type") == "xml":

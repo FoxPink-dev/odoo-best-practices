@@ -147,6 +147,8 @@ def build_graph(model_data, module_deps=None):
         result["dependency"] = mdg.build()
 
     return result
+
+
 def graph_to_mermaid(graph_result, graph_type="inheritance"):
     """Convert a graph result to Mermaid.js diagram format.
 

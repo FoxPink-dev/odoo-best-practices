@@ -36,12 +36,13 @@ class ModelParser:
             return
 
         rel_path = os.path.relpath(filepath, addon_dir).replace("\\", "/")
+        source_lines = source.split("\n")
 
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
-                self._parse_class(node, rel_path)
+                self._parse_class(node, rel_path, source_lines)
 
-    def _parse_class(self, node, rel_path):
+    def _parse_class(self, node, rel_path, source_lines=None):
         """Parse a single class definition for Odoo model info."""
         bases = [self._base_name(b) for b in node.bases]
         is_odoo_model = any(b in self.MODEL_CLASSES for b in bases)
@@ -90,7 +91,7 @@ class ModelParser:
 
         # Extract fields and methods
         self.fields[tech_name] = self._extract_fields(node, rel_path)
-        self.methods[tech_name] = self._extract_methods(node, rel_path)
+        self.methods[tech_name] = self._extract_methods(node, rel_path, source_lines)
 
     def _extract_fields(self, class_node, rel_path):
         """Extract field definitions from a model class."""
@@ -148,7 +149,7 @@ class ModelParser:
             "params": params,
         }
 
-    def _extract_methods(self, class_node, rel_path):
+    def _extract_methods(self, class_node, rel_path, source_lines=None):
         """Extract method definitions, especially Odoo-decorated ones."""
         methods = []
         for item in class_node.body:
@@ -157,11 +158,23 @@ class ModelParser:
                     "name": item.name,
                     "line": item.lineno,
                     "decorators": [],
+                    "file": rel_path,
+                    "code": "",
                 }
                 for dec in item.decorator_list:
                     dec_name = self._decorator_name(dec)
                     if dec_name:
                         method_info["decorators"].append(dec_name)
+                # Extract method body source code
+                if source_lines:
+                    try:
+                        end_lineno = item.end_lineno
+                    except AttributeError:
+                        end_lineno = None
+                    if end_lineno:
+                        start = max(0, item.lineno - 1)
+                        end = min(len(source_lines), end_lineno)
+                        method_info["code"] = "\n".join(source_lines[start:end])
                 methods.append(method_info)
         return methods
 

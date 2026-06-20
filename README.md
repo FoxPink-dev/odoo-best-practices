@@ -4,7 +4,7 @@
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
 [![Odoo 14-19](https://img.shields.io/badge/Odoo-14%20to%2019-purple)](https://www.odoo.com)
 
-Static analysis engine + domain knowledge platform + MCP server for Odoo module development. Covers **118 rules**, **12 anti-patterns**, **6 Odoo versions**, and provides **14 MCP tools** for AI-assisted code review.
+Static analysis engine + domain knowledge platform + MCP server for Odoo module development. Covers **136 rules**, **12 anti-patterns**, **6 Odoo versions**, and provides **14 MCP tools** for AI-assisted code review.
 
 ---
 
@@ -384,35 +384,41 @@ print(store.repository_summary())
 
 ```
 odoo-best-practices/
-├── SKILL.md                       # Entry point — 14 tool definitions
-├── AGENTS.md                      # Full compiled reference
+├── SKILL.md                       # Entry point — rule index + triggers
+├── AGENTS.md                      # Full compiled reference (136 rules)
 ├── README.md                      # This file
-├── rules/                         # 118 rule files (13 categories)
+├── rules/                         # 136 rule files (13 categories)
 ├── bad_patterns/                  # 12 anti-pattern detectors
-├── knowledge/                     # 5 core model domain files
+├── knowledge/                     # 12 core model domain files
 ├── versions/{14,15,16,17,18,19}/ # Version-specific guides
 ├── docs/                          # 60 official Odoo docs (14-19)
-└── analyzer/                      # Python static analysis engine
-    ├── cli.py                     # CLI: report / check / index
-    ├── checker.py                 # AST rule engine
-    ├── indexer.py                 # Repository index
-    ├── reporter.py                # Markdown/JSON report
-    ├── baseline.py                # Baseline suppression
-    ├── sarif.py                   # SARIF v2.1.0 output
-    ├── store.py                   # RepositoryStore (unified API)
-    ├── mcp_server.py              # MCP protocol server (14 tools)
-    ├── graph.py                   # Inheritance + dependency graphs
-    └── parsers/
-        ├── manifest_parser.py
-        ├── model_parser.py
-        ├── view_parser.py
-        └── security_parser.py
-.github/
-├── workflows/odoo-review.yml      # GitHub Action workflow
-└── actions/odoo-review/           # Custom action
-    └── entrypoint.py
-.opencode/
-└── skill.json                     # OpenCode skill config
+├── analyzer/                      # Python static analysis engine
+│   ├── cli.py                     # CLI: 8 sub-commands (report/check/index/graph/stats/baseline/init)
+│   ├── checker.py                 # AST rule engine (4 checks)
+│   ├── constants.py               # Shared severity constants
+│   ├── indexer.py                 # Repository index
+│   ├── reporter.py                # Markdown/JSON report
+│   ├── baseline.py                # Baseline suppression
+│   ├── sarif.py                   # SARIF v2.1.0 output (7 rules with fix suggestions)
+│   ├── store.py                   # RepositoryStore (unified API)
+│   ├── mcp_server.py              # MCP protocol server (14 tools)
+│   ├── graph.py                   # Inheritance + dependency graphs
+│   ├── init_generator.py          # Per-IDE config generator (5 IDEs)
+│   ├── parsers/
+│   │   ├── common.py              # Shared AST helpers
+│   │   ├── manifest_parser.py
+│   │   ├── model_parser.py
+│   │   ├── view_parser.py
+│   │   └── security_parser.py
+├── package.json                   # npm wrapper for `npx odoo-review`
+├── bin/                           # npm CLI entry point
+├── .npmignore
+├── .github/
+│   ├── workflows/odoo-review.yml
+│   ├── workflows/publish-pypi.yml
+│   ├── workflows/publish-npm.yml
+│   └── actions/odoo-review/
+│       └── entrypoint.py
 ```
 
 ---
@@ -445,5 +451,5 @@ This project demonstrates:
 - **Static analysis** — Rule engine, pattern detection
 - **DevSecOps** — CI/CD integration, quality gates
 - **MCP/AI tooling** — 14 tools for AI agents
-- **Rule engine design** — 118 rules across 13 categories
+- **Rule engine design** — 136 rules across 13 categories
 - **Platform engineering** — From CLI to GitHub Action to AI integration

@@ -193,7 +193,7 @@ deploy-config-params, deploy-env-detection, deploy-feature-flags, deploy-logging
 
 ## Documentation Reference
 
-50 official Odoo documentation files fetched in `docs/`:
+60 official Odoo documentation files fetched in `docs/`:
 
 | Version | Pages | Key Content |
 |---------|-------|-------------|

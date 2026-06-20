@@ -17,7 +17,6 @@ import json
 import os
 import sys
 import urllib.request
-import urllib.parse
 
 # Add the analyzer package to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -144,13 +143,19 @@ def main():
 
         # Apply baseline suppression if requested
         if use_baseline:
-            from analyzer.baseline import Baseline
             bl = Baseline(abs_addon, baseline_path=baseline_path)
             loaded = bl.load()
             if loaded:
                 filtered = bl.filter(violations_list)
                 violations_list = filtered["new"]
                 known_count = filtered["summary"]["known"]
+                v_summary = {
+                    "total": len(violations_list),
+                    "critical": sum(1 for v in violations_list if v.get("severity", "").upper() == "CRITICAL"),
+                    "high": sum(1 for v in violations_list if v.get("severity", "").upper() == "HIGH"),
+                    "medium": sum(1 for v in violations_list if v.get("severity", "").upper() == "MEDIUM"),
+                    "low": sum(1 for v in violations_list if v.get("severity", "").upper() == "LOW"),
+                }
                 print(f"::group::Baseline suppression applied: {known_count} known violations suppressed")
                 print(f"::endgroup::")
             else:

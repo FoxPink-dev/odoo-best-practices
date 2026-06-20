@@ -187,4 +187,3 @@ class Baseline:
         """Write baseline to disk."""
         with open(self._baseline_path, "w", encoding="utf-8") as f:
             json.dump(self._baseline_data, f, indent=2)
-        print("Baseline written: %s (%s violations)" % (self._baseline_path, self._baseline_data['total_accepted']))

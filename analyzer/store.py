@@ -50,7 +50,6 @@ class RepositoryStore:
         self._indexer = RepositoryIndex(self.addon_dir)
         self._index = self._indexer.build()
         self._total_models = len(self._index.get("models", []))
-        self._total_fields = len(self._index.get("fields", []))
 
         # Run checker
         from .reporter import Reporter

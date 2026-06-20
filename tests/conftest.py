@@ -18,7 +18,7 @@ def manifest_data(demo_addon_path):
 
 
 @pytest.fixture
-def model_data(demo_addon_path, manifest_data):
+def model_data(demo_addon_path):
     from analyzer.parsers.model_parser import ModelParser
     parser = ModelParser()
     parser.parse_addon(demo_addon_path)

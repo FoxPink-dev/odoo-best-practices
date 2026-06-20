@@ -49,6 +49,7 @@ def _cmd_baseline(addon_path, args):
     violations = reporter.results.get("check_results", {}).get("violations", [])
     bl = Baseline(addon_path, baseline_path=args.baseline_path)
     baseline = bl.generate(violations)
+    print("Baseline written: %s (%s violations)" % (bl._baseline_path, baseline['total_accepted']), file=sys.stderr)
     print(json.dumps(baseline, indent=2))
     return 0
 
@@ -89,13 +90,14 @@ def _cmd_stats(addon_path):
         top_rules = sorted(rule_counts.items(), key=lambda x: x[1], reverse=True)[:5]
         if top_rules:
             print("Top rules violated:")
+            max_rule_len = max(len(r) for r, _ in top_rules)
             for rule, count in top_rules:
                 sev = "?"
                 for v in violations:
                     if v.get("rule") == rule:
                         sev = v.get("severity", "?")
                         break
-                print("  %s (%s)%s -> %s violation(s)" % (rule, sev, ' ' * max(1, 35 - len(rule)), count,))
+                print("  %s (%s)%s -> %s violation(s)" % (rule, sev, ' ' * max(1, max_rule_len - len(rule) + 1), count,))
     else:
         print("  No violations found.")
     return 0
@@ -145,7 +147,7 @@ def _cmd_check(addon_path, args):
         msg = v.get("message", "?")
         conf = v.get("confidence", 50)
         conf_str = "%s%%" % (conf,) if args.confidence else ""
-        lines.append("| **%s** | %s | %s:%s | %s | %s |" % (sev, rule, fname, line_num, conf_str, msg,))
+        lines.append("| **%s** | %s | %s | %s | %s | %s |" % (sev, rule, fname, line_num, conf_str, msg,))
 
     if known_count:
         lines.append("\n*Baseline suppressed %s known violations.*\n" % (known_count,))

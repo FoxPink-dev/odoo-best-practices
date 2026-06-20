@@ -296,9 +296,9 @@ class MCPServer:
 
         # Load store if not already loaded for this addon
         if effective_dir != getattr(self, "_loaded_dir", None):
-            self._loaded_dir = effective_dir
             self.store = RepositoryStore(effective_dir)
             self.store.load()
+            self._loaded_dir = effective_dir
 
         handler = getattr(self, f"tool_{tool_name}", None)
         if handler is None:

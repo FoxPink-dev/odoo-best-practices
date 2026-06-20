@@ -15,7 +15,7 @@ metadata:
 
 # Odoo Development Best Practices
 
-Comprehensive optimization guide for Odoo module development, covering **13 categories with 130+ rules** prioritized by impact. Based on official Odoo documentation (versions 14–19), OCA guidelines, and production deployment experience.
+Comprehensive optimization guide for Odoo module development, covering **13 categories with 136 rules** prioritized by impact. Based on official Odoo documentation (versions 14–19), OCA guidelines, and production deployment experience.
 
 ## When to Apply
 
@@ -51,21 +51,21 @@ Reference these guidelines when:
 
 ---
 
-## 1. Module Structure & Architecture (CRITICAL) — 12 rules
+## 1. Module Structure & Architecture (CRITICAL) — 15 rules
 
-`module-directory-layout`, `module-directory-structure`, `module-manifest`, `module-dependencies`, `module-data-files`, `module-security-groups`, `module-record-rules`, `module-field-access`, `module-ir-cron`, `module-ir-sequence`, `module-ir-actions`, `module-demo-data`, `module-upgrade-migration`
+`module-directory-layout`, `module-directory-structure`, `module-manifest`, `module-dependencies`, `module-data-files`, `module-security-groups`, `module-record-rules`, `module-field-access`, `module-ir-cron`, `module-ir-sequence`, `module-ir-actions`, `module-demo-data`, `module-upgrade-migration`, `module-inherit-never-fork`, `module-single-responsibility`
 
-## 2. ORM & Data Access (CRITICAL) — 15 rules
+## 2. ORM & Data Access (CRITICAL) — 18 rules
 
-`orm-naming-conventions`, `orm-api-usage`, `orm-computed-fields`, `orm-related-fields`, `orm-onchange`, `orm-constraints`, `orm-model-inheritance`, `orm-order-sorting`, `orm-rec-name`, `orm-defaults`, `orm-selection-fields`, `orm-monetary-fields`, `orm-binary-fields`, `orm-transient-model`, `orm-m2m-through`
+`orm-naming-conventions`, `orm-api-usage`, `orm-computed-fields`, `orm-related-fields`, `orm-onchange`, `orm-constraints`, `orm-model-inheritance`, `orm-order-sorting`, `orm-rec-name`, `orm-defaults`, `orm-selection-fields`, `orm-monetary-fields`, `orm-binary-fields`, `orm-transient-model`, `orm-m2m-through`, `orm-batch-operations`, `orm-field-index`, `orm-no-n-plus-1`
 
-## 3. Security (HIGH) — 8 rules
+## 3. Security (HIGH) — 11 rules
 
-`security-ir-model-access`, `security-record-rules`, `security-field-groups`, `security-sudo-usage`, `security-check-access-rights`, `security-multi-company`, `security-ir-rule-global`, `security-permissions-inherit`
+`security-ir-model-access`, `security-record-rules`, `security-field-groups`, `security-sudo-usage`, `security-check-access-rights`, `security-multi-company`, `security-ir-rule-global`, `security-permissions-inherit`, `security-acl-required`, `security-least-privilege`, `security-record-rules-row-level`
 
-## 4. Views & View Inheritance (MEDIUM-HIGH) — 12 rules
+## 4. Views & View Inheritance (MEDIUM-HIGH) — 14 rules
 
-`view-tree-list`, `view-form`, `view-search`, `view-kanban`, `view-graph-pivot`, `view-inheritance`, `view-widget-usage`, `view-button-positions`, `view-dashboard`, `view-calendar`, `view-gantt`, `view-activity`
+`view-tree-list`, `view-form`, `view-search`, `view-kanban`, `view-graph-pivot`, `view-inheritance`, `view-widget-usage`, `view-button-positions`, `view-dashboard`, `view-calendar`, `view-gantt`, `view-activity`, `view-inherit-not-replace`, `view-new-list-tag`
 
 ## 5. API & Web Controllers (MEDIUM) — 6 rules
 
@@ -75,13 +75,13 @@ Reference these guidelines when:
 
 `data-xml-id-naming`, `data-noupdate`, `data-demo-data`, `data-csv-import`, `data-company-dependent`, `data-default-data`, `data-sequences`, `data-email-templates`
 
-## 7. Performance & Caching (MEDIUM) — 6 rules
+## 7. Performance & Caching (MEDIUM) — 8 rules
 
-`perf-search-optimization`, `perf-batch-operations`, `perf-avoid-n-plus-one`, `perf-index-usage`, `perf-cache-management`, `perf-compute-store`
+`perf-search-optimization`, `perf-batch-operations`, `perf-avoid-n-plus-one`, `perf-index-usage`, `perf-cache-management`, `perf-compute-store`, `perf-computed-dependencies`, `perf-profile-first`
 
-## 8. Testing (MEDIUM) — 7 rules
+## 8. Testing (MEDIUM) — 10 rules
 
-`test-unit-tests`, `test-httpcase`, `test-tour`, `test-fixtures`, `test-mock-external`, `test-coverage`, `test-tags`
+`test-unit-tests`, `test-httpcase`, `test-tour`, `test-fixtures`, `test-mock-external`, `test-coverage`, `test-tags`, `test-httpcase-for-controllers`, `test-tags-correct`, `test-transactioncase-default`
 
 ## 9. Migration & Upgrade (MEDIUM) — 11 rules
 
@@ -91,7 +91,7 @@ Reference these guidelines when:
 
 `owl-setup-not-constructor`, `owl-template-naming`, `owl-three-files`, `owl-props-validation`, `owl-usestate-reactive`, `owl-lifecycle-hooks`, `owl-useservice-not-direct`, `owl-slot-composition`, `owl-cleanup-subscriptions`, `owl-patch-not-fork`, `owl-asset-registration`, `owl-t-out-over-t-esc`, `owl-avoid-jquery`
 
-## 11. Coding Standards & Lint (LOW) — 10 rules
+## 11. Coding Standards & Lint (LOW) — 13 rules
 
 `code-python-style`, `code-import-order`, `code-comments`, `code-error-handling`, `code-logging`, `code-versioning`, `code-decorators`, `code-dependencies`, `code-encoding`, `code-api-vs-model`, `lint-pre-commit`, `lint-no-monkey-patch`, `lint-api-decorators`
 

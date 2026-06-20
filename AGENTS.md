@@ -12,7 +12,7 @@ metadata:
 
 # Odoo Development Best Practices — Full Reference
 
-> **130+ rules** across 13 categories with anti-pattern detection, version-specific guides, documentation references, and domain knowledge pack.
+> **136 rules** across 13 categories with anti-pattern detection, version-specific guides, documentation references, and domain knowledge pack.
 
 ## Structure
 
@@ -67,14 +67,15 @@ odoo-best-practices/
 │       ├── model_parser.py
 │       ├── view_parser.py
 │       └── security_parser.py
-└── .opencode/
-    └── skill.json                # OpenCode skill configuration
+└── .github/                      # GitHub Action + CI
+    └── workflows/
+        └── odoo-review.yml
 ```
 
 ## Rule Categories
 
-### 1. Module Structure & Architecture (CRITICAL) — 12 rules
-module-directory-layout, module-directory-structure, module-manifest, module-dependencies, module-data-files, module-security-groups, module-record-rules, module-field-access, module-ir-cron, module-ir-sequence, module-ir-actions, module-demo-data, module-upgrade-migration
+### 1. Module Structure & Architecture (CRITICAL) — 15 rules
+module-directory-layout, module-directory-structure, module-manifest, module-dependencies, module-data-files, module-security-groups, module-record-rules, module-field-access, module-ir-cron, module-ir-sequence, module-ir-actions, module-demo-data, module-upgrade-migration, module-inherit-never-fork, module-single-responsibility
 
 ## Fix Suggestions
 
@@ -106,14 +107,14 @@ Fix suggestions are available in:
 - GitHub Action PR comments
 - All analyzer output formats (Markdown, JSON, SARIF)
 
-### 2. ORM & Data Access (CRITICAL) — 15 rules
-orm-naming-conventions, orm-api-usage, orm-computed-fields, orm-related-fields, orm-onchange, orm-constraints, orm-model-inheritance, orm-order-sorting, orm-rec-name, orm-defaults, orm-selection-fields, orm-monetary-fields, orm-binary-fields, orm-transient-model, orm-m2m-through
+### 2. ORM & Data Access (CRITICAL) — 18 rules
+orm-naming-conventions, orm-api-usage, orm-computed-fields, orm-related-fields, orm-onchange, orm-constraints, orm-model-inheritance, orm-order-sorting, orm-rec-name, orm-defaults, orm-selection-fields, orm-monetary-fields, orm-binary-fields, orm-transient-model, orm-m2m-through, orm-batch-operations, orm-field-index, orm-no-n-plus-1
 
-### 3. Security (HIGH) — 8 rules
-security-ir-model-access, security-record-rules, security-field-groups, security-sudo-usage, security-check-access-rights, security-multi-company, security-ir-rule-global, security-permissions-inherit
+### 3. Security (HIGH) — 11 rules
+security-ir-model-access, security-record-rules, security-field-groups, security-sudo-usage, security-check-access-rights, security-multi-company, security-ir-rule-global, security-permissions-inherit, security-acl-required, security-least-privilege, security-record-rules-row-level
 
-### 4. Views & View Inheritance (MEDIUM-HIGH) — 12 rules
-view-tree-list, view-form, view-search, view-kanban, view-graph-pivot, view-inheritance, view-widget-usage, view-button-positions, view-dashboard, view-calendar, view-gantt, view-activity
+### 4. Views & View Inheritance (MEDIUM-HIGH) — 14 rules
+view-tree-list, view-form, view-search, view-kanban, view-graph-pivot, view-inheritance, view-widget-usage, view-button-positions, view-dashboard, view-calendar, view-gantt, view-activity, view-inherit-not-replace, view-new-list-tag
 
 ### 5. API & Web Controllers (MEDIUM) — 6 rules
 api-web-controllers, api-external-api, api-report-pdf, api-email-template, api-portal, api-web-services
@@ -121,11 +122,11 @@ api-web-controllers, api-external-api, api-report-pdf, api-email-template, api-p
 ### 6. Data & XML (MEDIUM) — 8 rules
 data-xml-id-naming, data-noupdate, data-demo-data, data-csv-import, data-company-dependent, data-default-data, data-sequences, data-email-templates
 
-### 7. Performance & Caching (MEDIUM) — 6 rules
-perf-search-optimization, perf-batch-operations, perf-avoid-n-plus-one, perf-index-usage, perf-cache-management, perf-compute-store
+### 7. Performance & Caching (MEDIUM) — 8 rules
+perf-search-optimization, perf-batch-operations, perf-avoid-n-plus-one, perf-index-usage, perf-cache-management, perf-compute-store, perf-computed-dependencies, perf-profile-first
 
-### 8. Testing (MEDIUM) — 7 rules
-test-unit-tests, test-httpcase, test-tour, test-fixtures, test-mock-external, test-coverage, test-tags
+### 8. Testing (MEDIUM) — 10 rules
+test-unit-tests, test-httpcase, test-tour, test-fixtures, test-mock-external, test-coverage, test-tags, test-httpcase-for-controllers, test-tags-correct, test-transactioncase-default
 
 ### 9. Migration & Upgrade (MEDIUM) — 11 rules
 migrate-scripts-directory, migrate-three-types, migrate-version-bump, migrate-pre-raw-sql, migrate-post-orm, migrate-idempotent, migrate-backup-first, migrate-noupdate-handling, migrate-rename-utils, migrate-sequential-versions, migrate-openupgrade

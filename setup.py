@@ -6,7 +6,7 @@ setup(
     description="Static analysis + knowledge platform for Odoo engineering",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/your-org/odoo-best-practices",
+    url="https://github.com/FoxPink-dev/odoo-best-practices",
     license="MIT",
     author="videcode",
     packages=find_packages(include=["analyzer", "analyzer.*"]),

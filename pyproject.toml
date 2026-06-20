@@ -29,9 +29,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/odoo-best-practices"
-Repository = "https://github.com/your-org/odoo-best-practices"
-Documentation = "https://github.com/your-org/odoo-best-practices"
+Homepage = "https://github.com/FoxPink-dev/odoo-best-practices"
+Repository = "https://github.com/FoxPink-dev/odoo-best-practices"
+Documentation = "https://github.com/FoxPink-dev/odoo-best-practices"
 
 [project.scripts]
 odoo-review = "analyzer.cli:main"

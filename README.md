@@ -12,7 +12,7 @@ Static analysis engine + domain knowledge platform + MCP server for Odoo module 
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-org/odoo-best-practices.git
+git clone https://github.com/FoxPink-dev/odoo-best-practices.git
 cd odoo-best-practices
 
 # 2. Run analysis on your Odoo addon

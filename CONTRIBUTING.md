@@ -47,4 +47,4 @@ python -m pytest tests/test_checker.py
 
 ## Questions
 
-Open a [Discussion](https://github.com/your-org/odoo-best-practices/discussions) or [Issue](https://github.com/your-org/odoo-best-practices/issues).
+Open a [Discussion](https://github.com/FoxPink-dev/odoo-best-practices/discussions) or [Issue](https://github.com/FoxPink-dev/odoo-best-practices/issues).

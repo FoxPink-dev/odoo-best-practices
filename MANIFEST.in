@@ -1,0 +1,14 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include SECURITY.md
+include CONTRIBUTING.md
+include SKILL.md
+include AGENTS.md
+recursive-include rules *.md
+recursive-include bad_patterns *.md
+recursive-include knowledge *.md
+recursive-include docs *.md
+recursive-include versions */*
+recursive-include .github/workflows *.yml
+recursive-include .github/actions */*

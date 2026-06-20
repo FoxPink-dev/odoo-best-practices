@@ -1,0 +1,43 @@
+name: 'Odoo Static Analysis Review'
+description: 'Run Odoo code analysis on pull requests — detects CRITICAL/HIGH violations, missing ACLs, N+1 queries, and bad patterns'
+author: 'videcode'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  addon-path:
+    description: 'Path to the Odoo addon directory (relative to repository root)'
+    required: false
+    default: '.'
+  fail-on-critical:
+    description: 'Fail the check if CRITICAL violations are found'
+    required: false
+    default: 'true'
+  fail-on-high:
+    description: 'Fail the check if HIGH violations are found'
+    required: false
+    default: 'true'
+  github-token:
+    description: 'GitHub token for posting PR comments (uses secrets.GITHUB_TOKEN)'
+    required: true
+  baseline:
+    description: 'Use baseline suppression (loads odoo-baseline.json from addon root)'
+    required: false
+    default: 'false'
+  baseline-path:
+    description: 'Custom path to baseline.json file'
+    required: false
+    default: ''
+  generate-baseline:
+    description: 'Generate baseline.json instead of running check (one-time setup)'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.addon-path }}
+    - ${{ inputs.fail-on-critical }}
+    - ${{ inputs.fail-on-high }}

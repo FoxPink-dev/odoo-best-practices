@@ -1,0 +1,47 @@
+name: Odoo Review
+on:
+  pull_request:
+    paths:
+      - '**.py'
+      - '**/__manifest__.py'
+      - '**/__openerp__.py'
+      - '**/*.xml'
+      - '**/security/*.csv'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write  # Required for Code Scanning upload
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Odoo Static Analysis
+        uses: ./github/actions/odoo-review  # local path — replace with org/repo@v1 for published action
+        with:
+          addon-path: '.'
+          fail-on-critical: 'true'
+          fail-on-high: 'true'
+          baseline: '${{ github.event.action == 'opened' || github.event.action == 'reopened' }}'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: odoo-review-results.sarif
+          category: odoo-analyzer
+        continue-on-error: true
+
+      - name: Generate Baseline (if none exists)
+        uses: ./github/actions/odoo-review
+        with:
+          addon-path: '.'
+          generate-baseline: 'true'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        if: |-
+          !github.event.pull_request.head.repo.fork
+          && !hashFiles('odoo-baseline.json')
+

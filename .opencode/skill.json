@@ -1,0 +1,77 @@
+{
+  "name": "odoo-best-practices",
+  "description": "Odoo development best practices skill pack — 130+ rules across 13 categories: ORM, security, views, OWL, testing, migration, API, data, i18n, deploy, and anti-pattern detection. Covers Odoo 14-19.",
+  "version": "2.0.0",
+  "author": "videcode",
+  "license": "MIT",
+  "entry": "SKILL.md",
+  "triggers": [
+    "odoo",
+    "odoo module",
+    "odoo model",
+    "odoo view",
+    "odoo orm",
+    "odoo security",
+    "odoo owl",
+    "odoo testing",
+    "odoo migration",
+    "odoo api",
+    "odoo data",
+    "odoo i18n",
+    "odoo deploy"
+  ],
+  "categories": [
+    "module",
+    "orm",
+    "security",
+    "view",
+    "api",
+    "data",
+    "performance",
+    "testing",
+    "migration",
+    "owl",
+    "lint",
+    "code",
+    "i18n",
+    "deploy"
+  ],
+  "versions": ["14", "15", "16", "17", "18", "19"],
+  "mcp": {
+    "servers": [
+      {
+        "name": "odoo-analyzer",
+        "command": "python",
+        "args": ["-m", "analyzer.mcp_server", "${workspaceRoot}"],
+        "description": "Odoo static analysis: model/field/view/security queries, code checking, repository intelligence"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "name": "analyze_module",
+      "description": "Full Odoo addon analysis: models, views, security, dependencies, violations"
+    },
+    {
+      "name": "search_model",
+      "description": "Find Odoo model definition with fields, methods, inheritance chain"
+    },
+    {
+      "name": "check_repository",
+      "description": "Run AST rule engine + security audit on an Odoo addon"
+    },
+    {
+      "name": "explain_model",
+      "description": "Rich Odoo model explanation combining parsed data + domain knowledge"
+    }
+  ],
+  "analysis": {
+    "static": {
+      "parsers": ["manifest", "model", "view", "security"],
+      "engine": "AST (no eval, no runtime)",
+      "rules": 118,
+      "anti_patterns": 12,
+      "supported_versions": ["14", "15", "16", "17", "18", "19"]
+    }
+  }
+}
